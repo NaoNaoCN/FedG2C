@@ -1,0 +1,884 @@
+<mxfile host="Electron" pages="3">
+  <diagram id="fedg2c-c-prompt" name="01 Prompt 微调">
+    <mxGraphModel dx="2056" dy="1264" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2160" pageHeight="1600" background="#FFFFFF" math="0" shadow="0" adaptiveColors="auto">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=32;fontColor=#202020;fontStyle=1;" value="模块 C / 01　Prompt 微调数据流" vertex="1">
+          <mxGeometry height="54" width="1500" x="40" y="32" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=18;fontColor=#555555;fontStyle=0;" value="插入位置：专家 H → 加共享提示 p → 原始组合器；仅提示和目标域公共模块可训练。" vertex="1">
+          <mxGeometry height="36" width="1800" x="40" y="96" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-frozen" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;冻结原参数&lt;/b&gt;" vertex="1">
+          <mxGeometry height="44" width="160" x="1580" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-train" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;可训练参数&lt;/b&gt;" vertex="1">
+          <mxGeometry height="44" width="160" x="1760" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-data" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;张量 / 运算&lt;/b&gt;" vertex="1">
+          <mxGeometry height="44" width="160" x="1940" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="basis" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#202020;fontStyle=0;" value="默认路径：local_alpha = 0；单次前向处理一张目标图或一个根节点邻域。N = 视图节点数，M = 专家数，d = 隐藏维度，T = 输出维度。" vertex="1">
+          <mxGeometry height="35" width="2080" x="40" y="146" as="geometry" />
+        </mxCell>
+        <mxCell id="forward-frame" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=#A6A6A6;fillColor=#FFFFFF;pointerEvents=0;container=0;dashed=0;strokeWidth=1.3;" value="" vertex="1">
+          <mxGeometry height="560" width="2120" x="20" y="205" as="geometry" />
+        </mxCell>
+        <mxCell id="forward-frame-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=20;fontColor=#202020;fontStyle=1;" value="1　TargetModel.forward(view, root)：目标域单样本前向" vertex="1">
+          <mxGeometry height="36" width="2080" x="40" y="217" as="geometry" />
+        </mxCell>
+        <mxCell id="shared-frame" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=#6C8EBF;fillColor=#F8FAFE;pointerEvents=0;container=0;dashed=1;strokeWidth=1.3;" value="" vertex="1">
+          <mxGeometry height="252" width="700" x="390" y="265" as="geometry" />
+        </mxCell>
+        <mxCell id="shared-frame-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=20;fontColor=#202020;fontStyle=1;" value="共享表示路径（模块 B 原始参数冻结）" vertex="1">
+          <mxGeometry height="36" width="660" x="410" y="277" as="geometry" />
+        </mxCell>
+        <mxCell id="raw-x" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;view.x&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[N, F]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="140" x="40" y="335" as="geometry" />
+        </mxCell>
+        <mxCell id="node-adapter" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" tooltip="target_model.py:100,138；model.py:12-35" value="&lt;b style=&quot;font-size:17px&quot;&gt;node_adapter&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;FeatureAdapter&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;[N,F] → [N,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="140" x="220" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="experts" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;" tooltip="SharedBackbone.encode_experts；model.py:70-71" value="" vertex="1">
+          <mxGeometry height="176" width="140" x="400" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="experts-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=center;fontSize=17;fontColor=#202020;fontStyle=1;" value="experts" vertex="1">
+          <mxGeometry height="28" width="124" x="408" y="326" as="geometry" />
+        </mxCell>
+        <mxCell id="expert-0" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;fontSize=13;spacing=1;" value="expert 0" vertex="1">
+          <mxGeometry height="25" width="116" x="412" y="359" as="geometry" />
+        </mxCell>
+        <mxCell id="expert-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;fontSize=13;spacing=1;" value="expert 1" vertex="1">
+          <mxGeometry height="25" width="116" x="412" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="expert-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;fontSize=13;spacing=1;" value="…" vertex="1">
+          <mxGeometry height="25" width="116" x="412" y="421" as="geometry" />
+        </mxCell>
+        <mxCell id="expert-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;fontSize=13;spacing=1;" value="expert M−1" vertex="1">
+          <mxGeometry height="25" width="116" x="412" y="452" as="geometry" />
+        </mxCell>
+        <mxCell id="h" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;H&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[N, M, d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="140" x="580" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="p" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" tooltip="target_model.py:117-120,145-146" value="&lt;b style=&quot;font-size:17px&quot;&gt;prompt = p&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;[1, 1, d]；初始为 0&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="140" x="760" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="hook" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;ellipse;aspect=fixed;fontSize=30;" value="＋" vertex="1">
+          <mxGeometry height="60" width="60" x="800" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="hook-label" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=center;fontSize=16;fontColor=#202020;fontStyle=0;" value="H̃ = H + p&lt;br&gt;[N, M, d]" vertex="1">
+          <mxGeometry height="60" width="150" x="755" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-1" edge="1" parent="1" source="h" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="hook" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-2" edge="1" parent="1" source="p" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=13;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=0.5;exitY=1;entryX=0.5;entryY=0;exitPerimeter=1;entryPerimeter=1;" target="hook" value="广播相加">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-3" edge="1" parent="1" source="hook" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="composer" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="composer" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;" tooltip="target_model.py:148；composer.py:47-78" value="&lt;b style=&quot;font-size:15px&quot;&gt;RelationComposer&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;原始参数冻结&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;输出 [N,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="140" x="940" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="z-slot" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;Z&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[N, d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="140" x="1120" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-4" edge="1" parent="1" source="composer" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="z-slot" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="readout" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" tooltip="target_model.py:154-159" value="&lt;b style=&quot;font-size:14px&quot;&gt;任务读出（二选一）&lt;/b&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;图：mean(dim=0)&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;节点：z[root:root+1]&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;得到 [1,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="140" x="1300" y="305" as="geometry" />
+        </mxCell>
+        <mxCell id="head" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" tooltip="target_model.py:105,160" value="&lt;b style=&quot;font-size:17px&quot;&gt;head&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;Linear(d,T)&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[1,d] → [1,T]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="140" x="1480" y="325" as="geometry" />
+        </mxCell>
+        <mxCell id="logits" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;logits&lt;/b&gt;&lt;div style=&quot;font-size:12px;line-height:1.45&quot;&gt;[1, T]&lt;/div&gt;&lt;div style=&quot;font-size:12px;line-height:1.45&quot;&gt;未做 sigmoid / softmax&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="140" x="1660" y="325" as="geometry" />
+        </mxCell>
+        <mxCell id="loss" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#202020;" tooltip="target_train.py:14-21,58-63" value="&lt;b style=&quot;font-size:13px&quot;&gt;classification_loss&lt;/b&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;CE 或 BCEWithLogits&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;输出：标量 ℒ&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="160" x="1840" y="325" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-5" edge="1" parent="1" source="raw-x" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="node-adapter" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-6" edge="1" parent="1" source="node-adapter" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="experts" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-7" edge="1" parent="1" source="experts" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="h" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-8" edge="1" parent="1" source="z-slot" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="readout" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-9" edge="1" parent="1" source="readout" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="head" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-10" edge="1" parent="1" source="head" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="logits" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-11" edge="1" parent="1" source="logits" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="loss" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="x-adapted" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=center;fontSize=14;fontColor=#202020;fontStyle=0;" value="X [N,d]" vertex="1">
+          <mxGeometry height="27" width="140" x="220" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-index" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:14px&quot;&gt;view.edge_index&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[2, E]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="140" x="40" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="relations" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" tooltip="target_model.py:147；context.py:119-129" value="&lt;b style=&quot;font-size:13px&quot;&gt;structural_relations&lt;/b&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;self / direct / two_hop&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;[N,N,3]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="140" x="760" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-12" edge="1" parent="1" source="edge-index" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.25;entryX=0;entryY=0.85;exitPerimeter=1;entryPerimeter=1;" target="experts" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-13" edge="1" parent="1" source="edge-index" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.75;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="relations" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-14" edge="1" parent="1" source="relations" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0.7;entryY=1;exitPerimeter=1;entryPerimeter=1;" target="composer" value="R">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-attr" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:14px&quot;&gt;view.edge_attr&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;可选 [E,Fₑ]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="140" x="40" y="655" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-adapter" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" tooltip="target_model.py:101-104,139-141；edge_attr=None 时不创建" value="&lt;b style=&quot;font-size:14px&quot;&gt;edge_adapter&lt;/b&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;[E,Fₑ] → [E,d]&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;有边属性时使用&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="140" x="220" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-repr" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;edge&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;[E,d] 或 None&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="140" x="400" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-15" edge="1" parent="1" source="edge-attr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="edge-adapter" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-16" edge="1" parent="1" source="edge-adapter" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="edge-repr" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-17" edge="1" parent="1" source="edge-repr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=0.5;exitY=0;entryX=0.5;entryY=1;exitPerimeter=1;entryPerimeter=1;" target="experts" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="labels" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;训练标签 y&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;多类：[1]&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;二分类/多标签：[T]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="85" width="160" x="1840" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-18" edge="1" parent="1" source="labels" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=0.5;exitY=0;entryX=0.5;entryY=1;exitPerimeter=1;entryPerimeter=1;" target="loss" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="autograd" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#A33D32;fontStyle=0;" value="梯度：ℒ → head → 读出 → 适配模块 / 冻结基座 → 输入适配器&lt;br&gt;只更新黄色模块；冻结参数仍允许梯度经过。" vertex="1">
+          <mxGeometry height="65" width="780" x="1300" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-note" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=15;fontColor=#555555;fontStyle=0;" value="edge_index 用于专家消息传递和结构关系；edge_attr 仅经适配后送入专家。" vertex="1">
+          <mxGeometry height="45" width="700" x="590" y="667" as="geometry" />
+        </mxCell>
+        <mxCell id="optional-local" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#555555;fontStyle=0;" value="可选本地分支：在任务读出前融合 Z_final = α Z_local + (1−α) Z_shared。这里画默认 α=0；α=1 时跳过共享前向。" vertex="1">
+          <mxGeometry height="34" width="2080" x="40" y="783" as="geometry" />
+        </mxCell>
+        <mxCell id="method-detail" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=#A6A6A6;fillColor=#FFFFFF;pointerEvents=0;container=0;dashed=0;strokeWidth=1.3;" value="" vertex="1">
+          <mxGeometry height="430" width="1110" x="20" y="845" as="geometry" />
+        </mxCell>
+        <mxCell id="method-detail-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=20;fontColor=#202020;fontStyle=1;" value="2　Prompt：在专家输出与组合器之间广播相加" vertex="1">
+          <mxGeometry height="36" width="1070" x="40" y="857" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=#A6A6A6;fillColor=#FFFFFF;pointerEvents=0;container=0;dashed=0;strokeWidth=1.3;" value="" vertex="1">
+          <mxGeometry height="430" width="980" x="1160" y="845" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=20;fontColor=#202020;fontStyle=1;" value="参数边界与一个形状例子" vertex="1">
+          <mxGeometry height="36" width="940" x="1180" y="857" as="geometry" />
+        </mxCell>
+        <mxCell id="d-h" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;H&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[N,M,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="140" x="55" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="d-p" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;p（可训练）&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[1,1,d]；初始 0&lt;/div&gt;" vertex="1">
+          <mxGeometry height="65" width="180" x="280" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="d-add" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;ellipse;aspect=fixed;fontSize=30;" value="＋" vertex="1">
+          <mxGeometry height="60" width="60" x="340" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="d-ht" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;H̃ = H+p&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[N,M,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="140" x="500" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="d-flatten" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;reshape&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[L,d]&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;L = N×M&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="140" x="700" y="1020" as="geometry" />
+        </mxCell>
+        <mxCell id="d-qkv" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;冻结 Q / K / V&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;映射后的 q、k、v&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;[L,Hₐ,d/Hₐ]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="85" width="170" x="900" y="1017.5" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-19" edge="1" parent="1" source="d-h" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="d-add" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-20" edge="1" parent="1" source="d-add" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="d-ht" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-21" edge="1" parent="1" source="d-ht" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="d-flatten" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-22" edge="1" parent="1" source="d-flatten" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="d-qkv" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-23" edge="1" parent="1" source="d-p" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=0.5;exitY=1;entryX=0.5;entryY=0;exitPerimeter=1;entryPerimeter=1;" target="d-add" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="detail-note" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#202020;fontStyle=0;" value="每个节点、每个专家使用同一个 d 维向量；影响 Q、K、V 的输入。&lt;br&gt;没有新增图节点或提示边；关系张量 R 的形状和取值保持不变。&lt;br&gt;Hₐ = 注意力头数；公式：H̃[n,m,:] = H[n,m,:] + p[0,0,:]。" vertex="1">
+          <mxGeometry height="90" width="1020" x="55" y="1150" as="geometry" />
+        </mxCell>
+        <mxCell id="detail-code" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=14;fontColor=#666666;fontStyle=0;" value="代码：target_model.py:117–120, 145–146；composer.py:56–59" vertex="1">
+          <mxGeometry height="25" width="1020" x="55" y="1245" as="geometry" />
+        </mxCell>
+        <mxCell id="frozen-list" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;" value="&lt;b style=&quot;font-size:19px&quot;&gt;冻结&lt;/b&gt;&lt;div style=&quot;font-size:17px;line-height:1.45&quot;&gt;experts.*&lt;/div&gt;&lt;div style=&quot;font-size:17px;line-height:1.45&quot;&gt;composer.* 的原始参数&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="400" x="1200" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="train-list" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" value="&lt;b style=&quot;font-size:19px&quot;&gt;训练&lt;/b&gt;&lt;div style=&quot;font-size:17px;line-height:1.45&quot;&gt;node_adapter + head&lt;/div&gt;&lt;div style=&quot;font-size:17px;line-height:1.45&quot;&gt;可选 edge_adapter&lt;/div&gt;&lt;div style=&quot;font-size:17px;line-height:1.45&quot;&gt;prompt [1,1,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="470" x="1630" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="initial" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#202020;fontStyle=0;" value="初始化与未加适配的基座行为一致；黄色增量从目标标签获得梯度。&lt;br&gt;冻结原参数 ≠ no_grad；共享基座保持 eval()，但梯度可穿过前向。" vertex="1">
+          <mxGeometry height="68" width="900" x="1200" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="shapes" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#202020;fontStyle=0;" value="连续特征算例：N=6，F=5，M=4，d=64，T=1；r=4，b=8&lt;br&gt;[6,5] → [6,64] → [6,4,64] → [6,64] → [1,64] → [1,1]&lt;br&gt;若为节点任务：用 z[root:root+1] 替代节点均值，仍得到 [1,64]。" vertex="1">
+          <mxGeometry height="80" width="900" x="1200" y="1140" as="geometry" />
+        </mxCell>
+        <mxCell id="counts" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=15;fontColor=#555555;fontStyle=0;" value="该算例无边属性：输入适配器 384 + 任务头 65 + 方法增量 64 = 513 个可训练参数。" vertex="1">
+          <mxGeometry height="35" width="900" x="1200" y="1231" as="geometry" />
+        </mxCell>
+        <mxCell id="train-frame" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=#A6A6A6;fillColor=#FFFFFF;pointerEvents=0;container=0;dashed=0;strokeWidth=1.3;" value="" vertex="1">
+          <mxGeometry height="228" width="2120" x="20" y="1310" as="geometry" />
+        </mxCell>
+        <mxCell id="train-frame-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=20;fontColor=#202020;fontStyle=1;" value="3　监督训练与评估：target_train.py:58–115" vertex="1">
+          <mxGeometry height="36" width="2080" x="40" y="1322" as="geometry" />
+        </mxCell>
+        <mxCell id="t-samples" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;B 个目标样本&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;逐图 / 逐视图前向&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="60" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-logits" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;拼接 logits&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;[B,T]；cat(dim=0)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="300" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-loss" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;分类监督损失&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;CE / BCEWithLogits&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="540" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-back" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;loss.backward()&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;梯度穿过冻结前向&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="780" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-opt" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;AdamW.step()&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;仅更新黄色参数&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="1020" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-valid" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;验证集选 epoch&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;最低验证损失&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="1260" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-test" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;恢复最佳状态&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;核对基座 → 测试&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="1500" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-save" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;保存目标模型&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;target_model.pt&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="220" x="1740" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-24" edge="1" parent="1" source="t-samples" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-logits" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-25" edge="1" parent="1" source="t-logits" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-loss" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-26" edge="1" parent="1" source="t-loss" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-back" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-27" edge="1" parent="1" source="t-back" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-opt" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-28" edge="1" parent="1" source="t-opt" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-valid" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-29" edge="1" parent="1" source="t-valid" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-test" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-30" edge="1" parent="1" source="t-test" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-save" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="train-note" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=16;fontColor=#202020;fontStyle=0;" value="多类：logits [B,T] 对类别索引 [B] 用 CE；二分类/多标签：对 [B,T] 的已观测标签用 BCE，NaN 标签不计入损失。" vertex="1">
+          <mxGeometry height="30" width="2020" x="60" y="1484" as="geometry" />
+        </mxCell>
+        <mxCell id="footer" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=14;fontColor=#777777;fontStyle=0;" value="实现依据：fedg2c/target_model.py、target_data.py、target_train.py、composer.py；对照日期 2026-10-19。训练为目标域本地过程，无新增联邦通信。" vertex="1">
+          <mxGeometry height="28" width="2080" x="40" y="1560" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="fedg2c-c-lora" name="02 LoRA 微调">
+    <mxGraphModel dx="1469" dy="903" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2160" pageHeight="1600" background="#FFFFFF" math="0" shadow="0" adaptiveColors="auto">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=32;fontColor=#202020;fontStyle=1;" value="模块 C / 02　LoRA 微调数据流" vertex="1">
+          <mxGeometry height="54" width="1500" x="40" y="32" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=18;fontColor=#555555;fontStyle=0;" value="插入位置：组合器 query / key 映射；冻结原权重，新增低秩旁路 A、B。" vertex="1">
+          <mxGeometry height="36" width="1800" x="40" y="96" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-frozen" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;冻结原参数&lt;/b&gt;" vertex="1">
+          <mxGeometry height="44" width="160" x="1580" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-train" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;可训练参数&lt;/b&gt;" vertex="1">
+          <mxGeometry height="44" width="160" x="1760" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-data" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;张量 / 运算&lt;/b&gt;" vertex="1">
+          <mxGeometry height="44" width="160" x="1940" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="basis" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#202020;fontStyle=0;" value="默认路径：local_alpha = 0；单次前向处理一张目标图或一个根节点邻域。N = 视图节点数，M = 专家数，d = 隐藏维度，T = 输出维度。" vertex="1">
+          <mxGeometry height="35" width="2080" x="40" y="146" as="geometry" />
+        </mxCell>
+        <mxCell id="forward-frame" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=#A6A6A6;fillColor=#FFFFFF;pointerEvents=0;container=0;dashed=0;strokeWidth=1.3;" value="" vertex="1">
+          <mxGeometry height="560" width="2120" x="20" y="205" as="geometry" />
+        </mxCell>
+        <mxCell id="forward-frame-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=20;fontColor=#202020;fontStyle=1;" value="1　TargetModel.forward(view, root)：目标域单样本前向" vertex="1">
+          <mxGeometry height="36" width="2080" x="40" y="217" as="geometry" />
+        </mxCell>
+        <mxCell id="shared-frame" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=#6C8EBF;fillColor=#F8FAFE;pointerEvents=0;container=0;dashed=1;strokeWidth=1.3;" value="" vertex="1">
+          <mxGeometry height="252" width="700" x="390" y="265" as="geometry" />
+        </mxCell>
+        <mxCell id="shared-frame-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=20;fontColor=#202020;fontStyle=1;" value="共享表示路径（模块 B 原始参数冻结）" vertex="1">
+          <mxGeometry height="36" width="660" x="410" y="277" as="geometry" />
+        </mxCell>
+        <mxCell id="raw-x" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;view.x&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[N, F]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="140" x="40" y="335" as="geometry" />
+        </mxCell>
+        <mxCell id="node-adapter" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" tooltip="target_model.py:100,138；model.py:12-35" value="&lt;b style=&quot;font-size:17px&quot;&gt;node_adapter&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;FeatureAdapter&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;[N,F] → [N,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="140" x="220" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="experts" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;" tooltip="SharedBackbone.encode_experts；model.py:70-71" value="" vertex="1">
+          <mxGeometry height="176" width="140" x="400" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="experts-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=center;fontSize=17;fontColor=#202020;fontStyle=1;" value="experts" vertex="1">
+          <mxGeometry height="28" width="124" x="408" y="326" as="geometry" />
+        </mxCell>
+        <mxCell id="expert-0" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;fontSize=13;spacing=1;" value="expert 0" vertex="1">
+          <mxGeometry height="25" width="116" x="412" y="359" as="geometry" />
+        </mxCell>
+        <mxCell id="expert-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;fontSize=13;spacing=1;" value="expert 1" vertex="1">
+          <mxGeometry height="25" width="116" x="412" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="expert-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;fontSize=13;spacing=1;" value="…" vertex="1">
+          <mxGeometry height="25" width="116" x="412" y="421" as="geometry" />
+        </mxCell>
+        <mxCell id="expert-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;fontSize=13;spacing=1;" value="expert M−1" vertex="1">
+          <mxGeometry height="25" width="116" x="412" y="452" as="geometry" />
+        </mxCell>
+        <mxCell id="h" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;H&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[N, M, d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="140" x="580" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-1" edge="1" parent="1" source="h" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="composer" value="H [N,M,d]">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="composer" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;" tooltip="target_model.py:148；composer.py:47-78" value="&lt;b style=&quot;font-size:15px&quot;&gt;RelationComposer&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;Q / K 另加 LoRA&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;其余原参数冻结&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;输出 [N,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="140" x="940" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="lora-badge" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;fontSize=12;spacing=3;" value="新增 A_Q、B_Q、A_K、B_K" vertex="1">
+          <mxGeometry height="35" width="166" x="927" y="448" as="geometry" />
+        </mxCell>
+        <mxCell id="z-slot" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;Z&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[N, d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="140" x="1120" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-2" edge="1" parent="1" source="composer" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="z-slot" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="readout" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" tooltip="target_model.py:154-159" value="&lt;b style=&quot;font-size:14px&quot;&gt;任务读出（二选一）&lt;/b&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;图：mean(dim=0)&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;节点：z[root:root+1]&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;得到 [1,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="140" x="1300" y="305" as="geometry" />
+        </mxCell>
+        <mxCell id="head" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" tooltip="target_model.py:105,160" value="&lt;b style=&quot;font-size:17px&quot;&gt;head&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;Linear(d,T)&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[1,d] → [1,T]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="140" x="1480" y="325" as="geometry" />
+        </mxCell>
+        <mxCell id="logits" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;logits&lt;/b&gt;&lt;div style=&quot;font-size:12px;line-height:1.45&quot;&gt;[1, T]&lt;/div&gt;&lt;div style=&quot;font-size:12px;line-height:1.45&quot;&gt;未做 sigmoid / softmax&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="140" x="1660" y="325" as="geometry" />
+        </mxCell>
+        <mxCell id="loss" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#202020;" tooltip="target_train.py:14-21,58-63" value="&lt;b style=&quot;font-size:13px&quot;&gt;classification_loss&lt;/b&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;CE 或 BCEWithLogits&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;输出：标量 ℒ&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="160" x="1840" y="325" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-3" edge="1" parent="1" source="raw-x" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="node-adapter" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-4" edge="1" parent="1" source="node-adapter" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="experts" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-5" edge="1" parent="1" source="experts" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="h" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-6" edge="1" parent="1" source="z-slot" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="readout" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-7" edge="1" parent="1" source="readout" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="head" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-8" edge="1" parent="1" source="head" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="logits" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-9" edge="1" parent="1" source="logits" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="loss" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="x-adapted" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=center;fontSize=14;fontColor=#202020;fontStyle=0;" value="X [N,d]" vertex="1">
+          <mxGeometry height="27" width="140" x="220" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-index" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:14px&quot;&gt;view.edge_index&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[2, E]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="140" x="40" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="relations" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" tooltip="target_model.py:147；context.py:119-129" value="&lt;b style=&quot;font-size:13px&quot;&gt;structural_relations&lt;/b&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;self / direct / two_hop&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;[N,N,3]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="140" x="760" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-10" edge="1" parent="1" source="edge-index" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.25;entryX=0;entryY=0.85;exitPerimeter=1;entryPerimeter=1;" target="experts" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-11" edge="1" parent="1" source="edge-index" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.75;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="relations" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-12" edge="1" parent="1" source="relations" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0.7;entryY=1;exitPerimeter=1;entryPerimeter=1;" target="composer" value="R">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-attr" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:14px&quot;&gt;view.edge_attr&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;可选 [E,Fₑ]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="140" x="40" y="655" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-adapter" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" tooltip="target_model.py:101-104,139-141；edge_attr=None 时不创建" value="&lt;b style=&quot;font-size:14px&quot;&gt;edge_adapter&lt;/b&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;[E,Fₑ] → [E,d]&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;有边属性时使用&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="140" x="220" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-repr" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;edge&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;[E,d] 或 None&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="140" x="400" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-13" edge="1" parent="1" source="edge-attr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="edge-adapter" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-14" edge="1" parent="1" source="edge-adapter" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="edge-repr" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-15" edge="1" parent="1" source="edge-repr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=0.5;exitY=0;entryX=0.5;entryY=1;exitPerimeter=1;entryPerimeter=1;" target="experts" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="labels" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;训练标签 y&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;多类：[1]&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;二分类/多标签：[T]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="85" width="160" x="1840" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-16" edge="1" parent="1" source="labels" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=0.5;exitY=0;entryX=0.5;entryY=1;exitPerimeter=1;entryPerimeter=1;" target="loss" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="autograd" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#A33D32;fontStyle=0;" value="梯度：ℒ → head → 读出 → 适配模块 / 冻结基座 → 输入适配器&lt;br&gt;只更新黄色模块；冻结参数仍允许梯度经过。" vertex="1">
+          <mxGeometry height="65" width="780" x="1300" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-note" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=15;fontColor=#555555;fontStyle=0;" value="edge_index 用于专家消息传递和结构关系；edge_attr 仅经适配后送入专家。" vertex="1">
+          <mxGeometry height="45" width="700" x="590" y="667" as="geometry" />
+        </mxCell>
+        <mxCell id="optional-local" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#555555;fontStyle=0;" value="可选本地分支：在任务读出前融合 Z_final = α Z_local + (1−α) Z_shared。这里画默认 α=0；α=1 时跳过共享前向。" vertex="1">
+          <mxGeometry height="34" width="2080" x="40" y="783" as="geometry" />
+        </mxCell>
+        <mxCell id="method-detail" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=#A6A6A6;fillColor=#FFFFFF;pointerEvents=0;container=0;dashed=0;strokeWidth=1.3;" value="" vertex="1">
+          <mxGeometry height="430" width="1110" x="20" y="845" as="geometry" />
+        </mxCell>
+        <mxCell id="method-detail-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=20;fontColor=#202020;fontStyle=1;" value="2　LoRA：Q、K 各加一条低秩旁路（下图示意一层）" vertex="1">
+          <mxGeometry height="36" width="1070" x="40" y="857" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=#A6A6A6;fillColor=#FFFFFF;pointerEvents=0;container=0;dashed=0;strokeWidth=1.3;" value="" vertex="1">
+          <mxGeometry height="430" width="980" x="1160" y="845" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=20;fontColor=#202020;fontStyle=1;" value="参数边界与一个形状例子" vertex="1">
+          <mxGeometry height="36" width="940" x="1180" y="857" as="geometry" />
+        </mxCell>
+        <mxCell id="d-x" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;tokens = X&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[L,d]&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;L = N×M&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="140" x="55" y="1015" as="geometry" />
+        </mxCell>
+        <mxCell id="d-base" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;原 Linear（冻结）&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;XWᵀ+b → [L,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="65" width="190" x="280" y="935" as="geometry" />
+        </mxCell>
+        <mxCell id="d-a" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;lora_A&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;A [r,d]&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;XAᵀ → [L,r]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="85" width="140" x="280" y="1080" as="geometry" />
+        </mxCell>
+        <mxCell id="d-b" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;lora_B&lt;/b&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;B [d,r]，初始 0&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;XAᵀBᵀ → [L,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="85" width="140" x="460" y="1080" as="geometry" />
+        </mxCell>
+        <mxCell id="d-scale" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;× s/r&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[L,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="85" width="120" x="640" y="1080" as="geometry" />
+        </mxCell>
+        <mxCell id="d-add" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;ellipse;aspect=fixed;fontSize=30;" value="＋" vertex="1">
+          <mxGeometry height="60" width="60" x="820" y="1015" as="geometry" />
+        </mxCell>
+        <mxCell id="d-out" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;Q 或 K 投影&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[L,d]&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;后续拆分多头&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="150" x="935" y="1005" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-17" edge="1" parent="1" source="d-x" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=0.5;exitY=0;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="d-base" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-18" edge="1" parent="1" source="d-x" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=0.5;exitY=1;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="d-a" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-19" edge="1" parent="1" source="d-a" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="d-b" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-20" edge="1" parent="1" source="d-b" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="d-scale" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-21" edge="1" parent="1" source="d-base" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0.5;entryY=0;exitPerimeter=1;entryPerimeter=1;" target="d-add" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-22" edge="1" parent="1" source="d-scale" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0.5;entryY=1;exitPerimeter=1;entryPerimeter=1;" target="d-add" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-23" edge="1" parent="1" source="d-add" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="d-out" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="detail-note" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=16;fontColor=#202020;fontStyle=0;" value="Q/K 输出 = XWᵀ+b + (s/r)XAᵀBᵀ；s = lora_alpha，r = rank。&lt;br&gt;仅四个新增矩阵 A_Q、B_Q、A_K、B_K 可训练；V、输出映射、关系映射和专家原参数冻结。" vertex="1">
+          <mxGeometry height="58" width="1030" x="55" y="1184" as="geometry" />
+        </mxCell>
+        <mxCell id="detail-code" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=13;fontColor=#666666;fontStyle=0;" value="代码：target_model.py:74–88,113–114；vendor/loralib/layers.py:109–125,144–150" vertex="1">
+          <mxGeometry height="25" width="1030" x="55" y="1245" as="geometry" />
+        </mxCell>
+        <mxCell id="frozen-list" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;" value="&lt;b style=&quot;font-size:19px&quot;&gt;冻结&lt;/b&gt;&lt;div style=&quot;font-size:17px;line-height:1.45&quot;&gt;experts.*&lt;/div&gt;&lt;div style=&quot;font-size:17px;line-height:1.45&quot;&gt;composer.* 的原始参数&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="400" x="1200" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="train-list" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" value="&lt;b style=&quot;font-size:19px&quot;&gt;训练&lt;/b&gt;&lt;div style=&quot;font-size:17px;line-height:1.45&quot;&gt;node_adapter + head&lt;/div&gt;&lt;div style=&quot;font-size:17px;line-height:1.45&quot;&gt;可选 edge_adapter&lt;/div&gt;&lt;div style=&quot;font-size:17px;line-height:1.45&quot;&gt;Q/K 的 A、B 矩阵&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="470" x="1630" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="initial" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#202020;fontStyle=0;" value="初始化与未加适配的基座行为一致；黄色增量从目标标签获得梯度。&lt;br&gt;冻结原参数 ≠ no_grad；共享基座保持 eval()，但梯度可穿过前向。" vertex="1">
+          <mxGeometry height="68" width="900" x="1200" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="shapes" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#202020;fontStyle=0;" value="连续特征算例：N=6，F=5，M=4，d=64，T=1；r=4，b=8&lt;br&gt;[6,5] → [6,64] → [6,4,64] → [6,64] → [1,64] → [1,1]&lt;br&gt;若为节点任务：用 z[root:root+1] 替代节点均值，仍得到 [1,64]。" vertex="1">
+          <mxGeometry height="80" width="900" x="1200" y="1140" as="geometry" />
+        </mxCell>
+        <mxCell id="counts" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=15;fontColor=#555555;fontStyle=0;" value="该算例无边属性：输入适配器 384 + 任务头 65 + 方法增量 1,024 = 1,473 个可训练参数。" vertex="1">
+          <mxGeometry height="35" width="900" x="1200" y="1231" as="geometry" />
+        </mxCell>
+        <mxCell id="train-frame" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=#A6A6A6;fillColor=#FFFFFF;pointerEvents=0;container=0;dashed=0;strokeWidth=1.3;" value="" vertex="1">
+          <mxGeometry height="228" width="2120" x="20" y="1310" as="geometry" />
+        </mxCell>
+        <mxCell id="train-frame-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=20;fontColor=#202020;fontStyle=1;" value="3　监督训练与评估：target_train.py:58–115" vertex="1">
+          <mxGeometry height="36" width="2080" x="40" y="1322" as="geometry" />
+        </mxCell>
+        <mxCell id="t-samples" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;B 个目标样本&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;逐图 / 逐视图前向&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="60" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-logits" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;拼接 logits&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;[B,T]；cat(dim=0)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="300" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-loss" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;分类监督损失&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;CE / BCEWithLogits&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="540" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-back" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;loss.backward()&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;梯度穿过冻结前向&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="780" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-opt" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;AdamW.step()&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;仅更新黄色参数&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="1020" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-valid" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;验证集选 epoch&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;最低验证损失&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="1260" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-test" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;恢复最佳状态&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;核对基座 → 测试&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="1500" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-save" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;保存目标模型&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;target_model.pt&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="220" x="1740" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-24" edge="1" parent="1" source="t-samples" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-logits" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-25" edge="1" parent="1" source="t-logits" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-loss" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-26" edge="1" parent="1" source="t-loss" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-back" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-27" edge="1" parent="1" source="t-back" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-opt" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-28" edge="1" parent="1" source="t-opt" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-valid" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-29" edge="1" parent="1" source="t-valid" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-test" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-30" edge="1" parent="1" source="t-test" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-save" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="train-note" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=16;fontColor=#202020;fontStyle=0;" value="多类：logits [B,T] 对类别索引 [B] 用 CE；二分类/多标签：对 [B,T] 的已观测标签用 BCE，NaN 标签不计入损失。" vertex="1">
+          <mxGeometry height="30" width="2020" x="60" y="1484" as="geometry" />
+        </mxCell>
+        <mxCell id="footer" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=14;fontColor=#777777;fontStyle=0;" value="实现依据：fedg2c/target_model.py、target_data.py、target_train.py、composer.py；对照日期 2026-10-19。训练为目标域本地过程，无新增联邦通信。" vertex="1">
+          <mxGeometry height="28" width="2080" x="40" y="1560" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="fedg2c-c-adapter" name="03 Adapter 微调">
+    <mxGraphModel dx="2056" dy="1264" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2160" pageHeight="1600" background="#FFFFFF" math="0" shadow="0" adaptiveColors="auto">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=32;fontColor=#202020;fontStyle=1;" value="模块 C / 03　Adapter 微调数据流" vertex="1">
+          <mxGeometry height="54" width="1500" x="40" y="32" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=18;fontColor=#555555;fontStyle=0;" value="插入位置：组合器输出 Z → 瓶颈残差 Adapter → 任务读出；共享组合过程原参数冻结。" vertex="1">
+          <mxGeometry height="36" width="1800" x="40" y="96" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-frozen" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;冻结原参数&lt;/b&gt;" vertex="1">
+          <mxGeometry height="44" width="160" x="1580" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-train" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;可训练参数&lt;/b&gt;" vertex="1">
+          <mxGeometry height="44" width="160" x="1760" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-data" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;张量 / 运算&lt;/b&gt;" vertex="1">
+          <mxGeometry height="44" width="160" x="1940" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="basis" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#202020;fontStyle=0;" value="默认路径：local_alpha = 0；单次前向处理一张目标图或一个根节点邻域。N = 视图节点数，M = 专家数，d = 隐藏维度，T = 输出维度。" vertex="1">
+          <mxGeometry height="35" width="2080" x="40" y="146" as="geometry" />
+        </mxCell>
+        <mxCell id="forward-frame" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=#A6A6A6;fillColor=#FFFFFF;pointerEvents=0;container=0;dashed=0;strokeWidth=1.3;" value="" vertex="1">
+          <mxGeometry height="560" width="2120" x="20" y="205" as="geometry" />
+        </mxCell>
+        <mxCell id="forward-frame-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=20;fontColor=#202020;fontStyle=1;" value="1　TargetModel.forward(view, root)：目标域单样本前向" vertex="1">
+          <mxGeometry height="36" width="2080" x="40" y="217" as="geometry" />
+        </mxCell>
+        <mxCell id="shared-frame" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=#6C8EBF;fillColor=#F8FAFE;pointerEvents=0;container=0;dashed=1;strokeWidth=1.3;" value="" vertex="1">
+          <mxGeometry height="252" width="700" x="390" y="265" as="geometry" />
+        </mxCell>
+        <mxCell id="shared-frame-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=20;fontColor=#202020;fontStyle=1;" value="共享表示路径（模块 B 原始参数冻结）" vertex="1">
+          <mxGeometry height="36" width="660" x="410" y="277" as="geometry" />
+        </mxCell>
+        <mxCell id="raw-x" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;view.x&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[N, F]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="140" x="40" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="node-adapter" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" tooltip="target_model.py:100,138；model.py:12-35" value="&lt;b style=&quot;font-size:17px&quot;&gt;node_adapter&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;FeatureAdapter&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;[N,F] → [N,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="140" x="220" y="325" as="geometry" />
+        </mxCell>
+        <mxCell id="experts" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;" tooltip="SharedBackbone.encode_experts；model.py:70-71" value="" vertex="1">
+          <mxGeometry height="176" width="140" x="400" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="experts-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=center;fontSize=17;fontColor=#202020;fontStyle=1;" value="experts" vertex="1">
+          <mxGeometry height="28" width="124" x="408" y="326" as="geometry" />
+        </mxCell>
+        <mxCell id="expert-0" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;fontSize=13;spacing=1;" value="expert 0" vertex="1">
+          <mxGeometry height="25" width="116" x="412" y="359" as="geometry" />
+        </mxCell>
+        <mxCell id="expert-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;fontSize=13;spacing=1;" value="expert 1" vertex="1">
+          <mxGeometry height="25" width="116" x="412" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="expert-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;fontSize=13;spacing=1;" value="…" vertex="1">
+          <mxGeometry height="25" width="116" x="412" y="421" as="geometry" />
+        </mxCell>
+        <mxCell id="expert-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;fontSize=13;spacing=1;" value="expert M−1" vertex="1">
+          <mxGeometry height="25" width="116" x="412" y="452" as="geometry" />
+        </mxCell>
+        <mxCell id="h" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;H&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[N, M, d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="140" x="580" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-1" edge="1" parent="1" source="h" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="composer" value="H [N,M,d]">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="composer" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;" tooltip="target_model.py:148；composer.py:47-78" value="&lt;b style=&quot;font-size:15px&quot;&gt;RelationComposer&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;原始参数冻结&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;输出 [N,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="140" x="940" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="z-slot" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" tooltip="target_model.py:58-71,149-150" value="&lt;b style=&quot;font-size:14px&quot;&gt;ResidualAdapter&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;Z → Z̃&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;[N,d] → [N,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="140" x="1120" y="325" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-2" edge="1" parent="1" source="composer" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="z-slot" value="Z">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="readout" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" tooltip="target_model.py:154-159" value="&lt;b style=&quot;font-size:14px&quot;&gt;任务读出（二选一）&lt;/b&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;图：mean(dim=0)&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;节点：z[root:root+1]&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;得到 [1,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="140" x="1300" y="305" as="geometry" />
+        </mxCell>
+        <mxCell id="head" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" tooltip="target_model.py:105,160" value="&lt;b style=&quot;font-size:17px&quot;&gt;head&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;Linear(d,T)&lt;/div&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[1,d] → [1,T]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="140" x="1480" y="325" as="geometry" />
+        </mxCell>
+        <mxCell id="logits" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;logits&lt;/b&gt;&lt;div style=&quot;font-size:12px;line-height:1.45&quot;&gt;[1, T]&lt;/div&gt;&lt;div style=&quot;font-size:12px;line-height:1.45&quot;&gt;未做 sigmoid / softmax&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="140" x="1660" y="325" as="geometry" />
+        </mxCell>
+        <mxCell id="loss" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#202020;" tooltip="target_train.py:14-21,58-63" value="&lt;b style=&quot;font-size:13px&quot;&gt;classification_loss&lt;/b&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;CE 或 BCEWithLogits&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;输出：标量 ℒ&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="160" x="1840" y="325" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-3" edge="1" parent="1" source="raw-x" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="node-adapter" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-4" edge="1" parent="1" source="node-adapter" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="experts" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-5" edge="1" parent="1" source="experts" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="h" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-6" edge="1" parent="1" source="z-slot" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="readout" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-7" edge="1" parent="1" source="readout" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="head" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-8" edge="1" parent="1" source="head" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="logits" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-9" edge="1" parent="1" source="logits" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="loss" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="x-adapted" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=center;fontSize=14;fontColor=#202020;fontStyle=0;" value="X [N,d]" vertex="1">
+          <mxGeometry height="27" width="140" x="220" y="430" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-index" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:14px&quot;&gt;view.edge_index&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[2, E]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="140" x="40" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="relations" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" tooltip="target_model.py:147；context.py:119-129" value="&lt;b style=&quot;font-size:13px&quot;&gt;structural_relations&lt;/b&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;self / direct / two_hop&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;[N,N,3]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="140" x="760" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-10" edge="1" parent="1" source="edge-index" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.25;entryX=0;entryY=0.85;exitPerimeter=1;entryPerimeter=1;" target="experts" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-11" edge="1" parent="1" source="edge-index" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.75;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="relations" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-12" edge="1" parent="1" source="relations" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0.7;entryY=1;exitPerimeter=1;entryPerimeter=1;" target="composer" value="R">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-attr" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:14px&quot;&gt;view.edge_attr&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;可选 [E,Fₑ]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="140" x="40" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-adapter" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" tooltip="target_model.py:101-104,139-141；edge_attr=None 时不创建" value="&lt;b style=&quot;font-size:14px&quot;&gt;edge_adapter&lt;/b&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;[E,Fₑ] → [E,d]&lt;/div&gt;&lt;div style=&quot;font-size:13px;line-height:1.45&quot;&gt;有边属性时使用&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="140" x="220" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-repr" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;edge&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;[E,d] 或 None&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="140" x="400" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-13" edge="1" parent="1" source="edge-attr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="edge-adapter" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-14" edge="1" parent="1" source="edge-adapter" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="edge-repr" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-15" edge="1" parent="1" source="edge-repr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=0.5;exitY=0;entryX=0.5;entryY=1;exitPerimeter=1;entryPerimeter=1;" target="experts" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="labels" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;训练标签 y&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;多类：[1]&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;二分类/多标签：[T]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="85" width="160" x="1840" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-16" edge="1" parent="1" source="labels" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=0.5;exitY=0;entryX=0.5;entryY=1;exitPerimeter=1;entryPerimeter=1;" target="loss" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="autograd" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#A33D32;fontStyle=0;" value="梯度：ℒ → head → 读出 → 适配模块 / 冻结基座 → 输入适配器&lt;br&gt;只更新黄色模块；冻结参数仍允许梯度经过。" vertex="1">
+          <mxGeometry height="65" width="780" x="1300" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-note" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=15;fontColor=#555555;fontStyle=0;" value="edge_index 用于专家消息传递和结构关系；edge_attr 仅经适配后送入专家。" vertex="1">
+          <mxGeometry height="45" width="700" x="590" y="667" as="geometry" />
+        </mxCell>
+        <mxCell id="optional-local" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#555555;fontStyle=0;" value="可选本地分支：在任务读出前融合 Z_final = α Z_local + (1−α) Z_shared。这里画默认 α=0；α=1 时跳过共享前向。" vertex="1">
+          <mxGeometry height="34" width="2080" x="40" y="783" as="geometry" />
+        </mxCell>
+        <mxCell id="method-detail" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=#A6A6A6;fillColor=#FFFFFF;pointerEvents=0;container=0;dashed=0;strokeWidth=1.3;" value="" vertex="1">
+          <mxGeometry height="430" width="1110" x="20" y="845" as="geometry" />
+        </mxCell>
+        <mxCell id="method-detail-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=20;fontColor=#202020;fontStyle=1;" value="2　Adapter：组合器输出之后的瓶颈残差变换" vertex="1">
+          <mxGeometry height="36" width="1070" x="40" y="857" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=#A6A6A6;fillColor=#FFFFFF;pointerEvents=0;container=0;dashed=0;strokeWidth=1.3;" value="" vertex="1">
+          <mxGeometry height="430" width="980" x="1160" y="845" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=20;fontColor=#202020;fontStyle=1;" value="参数边界与一个形状例子" vertex="1">
+          <mxGeometry height="36" width="940" x="1180" y="857" as="geometry" />
+        </mxCell>
+        <mxCell id="d-z" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;Z&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[N,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="140" x="55" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="d-down" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;down（可训练）&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;Linear(d,b)&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;[N,d] → [N,b]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="160" x="252" y="1020" as="geometry" />
+        </mxCell>
+        <mxCell id="d-relu" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;ReLU&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[N,b]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="140" x="460" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="d-up" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;up（可训练）&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;Linear(b,d)&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;[N,b] → [N,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="160" x="650" y="1020" as="geometry" />
+        </mxCell>
+        <mxCell id="d-add" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;ellipse;aspect=fixed;fontSize=30;" value="＋" vertex="1">
+          <mxGeometry height="60" width="60" x="860" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="d-zt" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:17px&quot;&gt;Z̃&lt;/b&gt;&lt;div style=&quot;font-size:15px;line-height:1.45&quot;&gt;[N,d]&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="970" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-17" edge="1" parent="1" source="d-z" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="d-down" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-18" edge="1" parent="1" source="d-down" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="d-relu" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-19" edge="1" parent="1" source="d-relu" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="d-up" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-20" edge="1" parent="1" source="d-up" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="d-add" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-21" edge="1" parent="1" source="d-add" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="d-zt" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-22" edge="1" parent="1" source="d-z" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;jettySize=55;exitX=0.5;exitY=0;entryX=0.5;entryY=0;exitPerimeter=1;entryPerimeter=1;" target="d-add" value="残差直连">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="detail-note" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#202020;fontStyle=0;" value="Z̃ = Z + up(ReLU(down(Z)))；b = bottleneck（默认 8）。&lt;br&gt;up.weight 和 up.bias 初始为 0，因此初始 Z̃ = Z。&lt;br&gt;该模块调整组合结果；不会直接修改组合器内部 Q/K 或关系映射原参数。" vertex="1">
+          <mxGeometry height="90" width="1030" x="55" y="1150" as="geometry" />
+        </mxCell>
+        <mxCell id="detail-code" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=14;fontColor=#666666;fontStyle=0;" value="代码：target_model.py:58–71,115–116,149–150" vertex="1">
+          <mxGeometry height="25" width="1030" x="55" y="1245" as="geometry" />
+        </mxCell>
+        <mxCell id="frozen-list" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#202020;" value="&lt;b style=&quot;font-size:19px&quot;&gt;冻结&lt;/b&gt;&lt;div style=&quot;font-size:17px;line-height:1.45&quot;&gt;experts.*&lt;/div&gt;&lt;div style=&quot;font-size:17px;line-height:1.45&quot;&gt;composer.* 的原始参数&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="400" x="1200" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="train-list" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" value="&lt;b style=&quot;font-size:19px&quot;&gt;训练&lt;/b&gt;&lt;div style=&quot;font-size:17px;line-height:1.45&quot;&gt;node_adapter + head&lt;/div&gt;&lt;div style=&quot;font-size:17px;line-height:1.45&quot;&gt;可选 edge_adapter&lt;/div&gt;&lt;div style=&quot;font-size:17px;line-height:1.45&quot;&gt;adapter.down / up&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="470" x="1630" y="910" as="geometry" />
+        </mxCell>
+        <mxCell id="initial" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#202020;fontStyle=0;" value="初始化与未加适配的基座行为一致；黄色增量从目标标签获得梯度。&lt;br&gt;冻结原参数 ≠ no_grad；共享基座保持 eval()，但梯度可穿过前向。" vertex="1">
+          <mxGeometry height="68" width="900" x="1200" y="1060" as="geometry" />
+        </mxCell>
+        <mxCell id="shapes" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=17;fontColor=#202020;fontStyle=0;" value="连续特征算例：N=6，F=5，M=4，d=64，T=1；r=4，b=8&lt;br&gt;[6,5] → [6,64] → [6,4,64] → [6,64] → [1,64] → [1,1]&lt;br&gt;若为节点任务：用 z[root:root+1] 替代节点均值，仍得到 [1,64]。" vertex="1">
+          <mxGeometry height="80" width="900" x="1200" y="1140" as="geometry" />
+        </mxCell>
+        <mxCell id="counts" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=15;fontColor=#555555;fontStyle=0;" value="该算例无边属性：输入适配器 384 + 任务头 65 + 方法增量 1,096 = 1,545 个可训练参数。" vertex="1">
+          <mxGeometry height="35" width="900" x="1200" y="1231" as="geometry" />
+        </mxCell>
+        <mxCell id="train-frame" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=#A6A6A6;fillColor=#FFFFFF;pointerEvents=0;container=0;dashed=0;strokeWidth=1.3;" value="" vertex="1">
+          <mxGeometry height="228" width="2120" x="20" y="1310" as="geometry" />
+        </mxCell>
+        <mxCell id="train-frame-title" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=20;fontColor=#202020;fontStyle=1;" value="3　监督训练与评估：target_train.py:58–115" vertex="1">
+          <mxGeometry height="36" width="2080" x="40" y="1322" as="geometry" />
+        </mxCell>
+        <mxCell id="t-samples" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;B 个目标样本&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;逐图 / 逐视图前向&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="60" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-logits" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;拼接 logits&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;[B,T]；cat(dim=0)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="300" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-loss" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#D5E8D4;strokeColor=#82B366;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;分类监督损失&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;CE / BCEWithLogits&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="540" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-back" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;loss.backward()&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;梯度穿过冻结前向&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="780" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-opt" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;AdamW.step()&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;仅更新黄色参数&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="1020" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-valid" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;验证集选 epoch&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;最低验证损失&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="1260" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-test" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;恢复最佳状态&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;核对基座 → 测试&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="170" x="1500" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="t-save" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:16px&quot;&gt;保存目标模型&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.45&quot;&gt;target_model.pt&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="220" x="1740" y="1385" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-23" edge="1" parent="1" source="t-samples" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-logits" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-24" edge="1" parent="1" source="t-logits" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-loss" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-25" edge="1" parent="1" source="t-loss" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-back" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-26" edge="1" parent="1" source="t-back" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-opt" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-27" edge="1" parent="1" source="t-opt" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-valid" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-28" edge="1" parent="1" source="t-valid" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-test" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-29" edge="1" parent="1" source="t-test" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=20;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="t-save" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="train-note" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=16;fontColor=#202020;fontStyle=0;" value="多类：logits [B,T] 对类别索引 [B] 用 CE；二分类/多标签：对 [B,T] 的已观测标签用 BCE，NaN 标签不计入损失。" vertex="1">
+          <mxGeometry height="30" width="2020" x="60" y="1484" as="geometry" />
+        </mxCell>
+        <mxCell id="footer" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;strokeColor=none;fillColor=none;spacing=0;align=left;fontSize=14;fontColor=#777777;fontStyle=0;" value="实现依据：fedg2c/target_model.py、target_data.py、target_train.py、composer.py；对照日期 2026-10-19。训练为目标域本地过程，无新增联邦通信。" vertex="1">
+          <mxGeometry height="28" width="2080" x="40" y="1560" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

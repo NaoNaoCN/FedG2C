@@ -1,0 +1,7 @@
+{
+  "num_experts": 3,
+  "datasets": ["photo", "computers", "wikics"],
+  "pretrain_num_clients": [1, 1, 1],
+  "finetune_datasets": ["arxiv"],
+  "finetune_num_clients": [1]
+}

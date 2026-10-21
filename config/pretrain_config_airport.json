@@ -1,0 +1,7 @@
+{
+  "num_experts": 6,
+  "datasets": ["cora", "pubmed", "citeseer", "photo", "computers", "wikics"],
+  "pretrain_num_clients": [1, 1, 1, 1, 1, 1],
+  "finetune_datasets": ["airport"],
+  "finetune_num_clients": [1]
+}

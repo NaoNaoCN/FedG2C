@@ -1,0 +1,44 @@
+[
+  {
+    "repository": "JinheonBaek/FED-PUB",
+    "commit": "302980ded3bb2b719fd0864e29607031372a3e6d",
+    "file": "third_party_references/module_b/FED-PUB/models/fedpub/server.py",
+    "url": "https://raw.githubusercontent.com/JinheonBaek/FED-PUB/302980ded3bb2b719fd0864e29607031372a3e6d/models/fedpub/server.py",
+    "sha256": "d5df776969fdd0700284087f64d7ebe8ea6efccf520e83288caaa8c33fca39c6"
+  },
+  {
+    "repository": "JinheonBaek/FED-PUB",
+    "commit": "302980ded3bb2b719fd0864e29607031372a3e6d",
+    "file": "third_party_references/module_b/FED-PUB/models/fedpub/client.py",
+    "url": "https://raw.githubusercontent.com/JinheonBaek/FED-PUB/302980ded3bb2b719fd0864e29607031372a3e6d/models/fedpub/client.py",
+    "sha256": "317890043455906ca66ff6f87be9a78c9700e9a257ba7838cb2bdc41182ac4e7"
+  },
+  {
+    "repository": "ZexiLee/ICML-2023-FedLAW",
+    "commit": "47f7a7226baeb4d684e5d555f793caba874adea3",
+    "file": "third_party_references/module_b/ICML-2023-FedLAW/server_funct.py",
+    "url": "https://raw.githubusercontent.com/ZexiLee/ICML-2023-FedLAW/47f7a7226baeb4d684e5d555f793caba874adea3/server_funct.py",
+    "sha256": "12cbeec8e535399983760b43310fa4dd7a663a3fbe4f6d688109a5cd3794dced"
+  },
+  {
+    "repository": "ZexiLee/ICML-2023-FedLAW",
+    "commit": "47f7a7226baeb4d684e5d555f793caba874adea3",
+    "file": "third_party_references/module_b/ICML-2023-FedLAW/LICENSE",
+    "url": "https://raw.githubusercontent.com/ZexiLee/ICML-2023-FedLAW/47f7a7226baeb4d684e5d555f793caba874adea3/LICENSE",
+    "sha256": "6c54b85d59dffe96f719e9540f331b18fbbb54f02ad8b9491e1c8b9cd44706f3"
+  },
+  {
+    "repository": "Hannah1102/GAD",
+    "commit": "f49dfd7f33eec1cbe107fa3e4929ca323632471c",
+    "file": "third_party_references/module_b/GAD/train_gad_distillation.py",
+    "url": "https://github.com/Hannah1102/GAD/blob/f49dfd7f33eec1cbe107fa3e4929ca323632471c/train_gad_distillation.py",
+    "sha256": "e732f234d1602279c1f436d96fa0e3778611aef539833ff81b5534bf968b20d0"
+  },
+  {
+    "repository": "Hannah1102/GAD",
+    "commit": "f49dfd7f33eec1cbe107fa3e4929ca323632471c",
+    "file": "third_party_references/module_b/GAD/LICENSE",
+    "url": "https://github.com/Hannah1102/GAD/blob/f49dfd7f33eec1cbe107fa3e4929ca323632471c/LICENSE",
+    "sha256": "8b97fd32ef1c9d5e2b1fb99a478ecec5ecb67c67c5bc3063f8460422d93cfde2"
+  }
+]

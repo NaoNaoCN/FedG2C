@@ -1,0 +1,52 @@
+[
+  {
+    "name": "LoRA",
+    "repo": "https://github.com/microsoft/LoRA",
+    "commit": "c4593f060e6a368d7bb5af5273b8e42810cdef90",
+    "usage": "Official loralib runtime copied verbatim, MIT",
+    "files": [
+      "fedg2c/vendor/loralib/LICENSE",
+      "fedg2c/vendor/loralib/__init__.py",
+      "fedg2c/vendor/loralib/utils.py",
+      "fedg2c/vendor/loralib/layers.py"
+    ],
+    "sha256": {
+      "fedg2c/vendor/loralib/LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "fedg2c/vendor/loralib/__init__.py": "df9ca7e519d0bbe03679eac45ed00d9b99d0434d106dcdd2b600765b99192027",
+      "fedg2c/vendor/loralib/utils.py": "9cd157527f79d48cf6f5feb7eb87509696e5f3cbb38862a633239e464eacaa71",
+      "fedg2c/vendor/loralib/layers.py": "ea9fa6bd0930dfbf5af08440f6c71aeab3408cf07d3cca7620c86c45ea730797"
+    }
+  },
+  {
+    "name": "GPF",
+    "repo": "https://github.com/LuckyTiger123/GPF",
+    "commit": "116ac462e593a67b99471f165e219e45a97cfc11",
+    "usage": "Mechanism adaptation; source for inspection only, MIT",
+    "files": [
+      "third_party_references/module_c/GPF/COMMIT",
+      "third_party_references/module_c/GPF/LICENSE",
+      "third_party_references/module_c/GPF/README.md",
+      "third_party_references/module_c/GPF/chem/graph_prompt.py",
+      "third_party_references/module_c/GPF/chem/model.py"
+    ],
+    "sha256": {
+      "third_party_references/module_c/GPF/COMMIT": "f3a8cfbc1516d54872e0f1122d02db8c985a20c8805ff4a8c4651fa0b7357e33",
+      "third_party_references/module_c/GPF/LICENSE": "2d086bb1ef4253efce1389cc1235014b71f014df84325670a7fadb538d5ebd24",
+      "third_party_references/module_c/GPF/README.md": "68940f69f9a8352d0d1390354ee823f43e579a1ee2b07a94f9a7f5383ba41628",
+      "third_party_references/module_c/GPF/chem/graph_prompt.py": "5862df51afdc7de803f116c237cdf5c3342fea8acfe2d576bd87a856e2fe6821",
+      "third_party_references/module_c/GPF/chem/model.py": "152366bb6dada2b43134e307f8f2bc706afe00a72afa9208ff79996c246559da"
+    }
+  },
+  {
+    "name": "AdapterGNN",
+    "repo": "https://github.com/Lucius-lsr/AdapterGNN",
+    "commit": "9be3663610e0d06c85ec0bce27689d6574507001",
+    "usage": "Mechanism reference only; no root license found, not relicensed or imported",
+    "files": [
+      "third_party_references/module_c/AdapterGNN/adapterGNN.py"
+    ],
+    "sha256": {
+      "third_party_references/module_c/AdapterGNN/adapterGNN.py": "1057046ecb72634f83f2331f5699c662162c8a22762859035564bb2f5868753a"
+    }
+  }
+]

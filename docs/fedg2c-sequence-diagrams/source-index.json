@@ -1,0 +1,1846 @@
+{
+  "source_references": [
+    {
+      "path": "pretrain_federated_fedg2c.py",
+      "symbol": "main",
+      "line": 24
+    },
+    {
+      "path": "fedg2c/edge_client.py",
+      "symbol": "EdgePredictionClient",
+      "line": 8
+    },
+    {
+      "path": "fedg2c/edge_views.py",
+      "symbol": "NeighborhoodEdgeSampler",
+      "line": 58
+    },
+    {
+      "path": "fedg2c/edge_model.py",
+      "symbol": "NodewisePredictionModel",
+      "line": 38
+    },
+    {
+      "path": "fedg2c/edge_model.py",
+      "symbol": "MaskedEncodingBranch",
+      "line": 12
+    },
+    {
+      "path": "fedg2c/model.py",
+      "symbol": "SharedBackbone",
+      "line": 56
+    },
+    {
+      "path": "fedg2c/graph_predictor.py",
+      "symbol": "GraphSAGEPredictor",
+      "line": 12
+    },
+    {
+      "path": "fedg2c/edge_model.py",
+      "symbol": "NodewisePredictionModel.update_momentum",
+      "line": 73
+    },
+    {
+      "path": "pretrain_fedg2c.py",
+      "symbol": "main",
+      "line": 10
+    },
+    {
+      "path": "fedg2c/edge_entry.py",
+      "symbol": "run",
+      "line": 13
+    },
+    {
+      "path": "fedg2c/edge_client.py",
+      "symbol": "EdgePredictionClient.__init__",
+      "line": 10
+    },
+    {
+      "path": "fedg2c/edge_model.py",
+      "symbol": "NodewisePredictionModel.__init__",
+      "line": 44
+    },
+    {
+      "path": "fedg2c/edge_client.py",
+      "symbol": "EdgePredictionClient.set_pretrain_model",
+      "line": 16
+    },
+    {
+      "path": "fedg2c/edge_model.py",
+      "symbol": "NodewisePredictionModel.reset_momentum",
+      "line": 68
+    },
+    {
+      "path": "fedg2c/edge_client.py",
+      "symbol": "EdgePredictionClient.pretrain",
+      "line": 35
+    },
+    {
+      "path": "fedg2c/context.py",
+      "symbol": "ContextSampler.__init__",
+      "line": 67
+    },
+    {
+      "path": "fedg2c/edge_views.py",
+      "symbol": "NeighborhoodEdgeSampler.sample_edge_view",
+      "line": 80
+    },
+    {
+      "path": "fedg2c/edge_views.py",
+      "symbol": "NeighborhoodEdgeSampler.neighborhood",
+      "line": 65
+    },
+    {
+      "path": "fedg2c/edge_views.py",
+      "symbol": "mask_edges",
+      "line": 29
+    },
+    {
+      "path": "fedg2c/edge_views.py",
+      "symbol": "EdgePredictionPair",
+      "line": 15
+    },
+    {
+      "path": "fedg2c/edge_model.py",
+      "symbol": "NodewisePredictionModel.forward",
+      "line": 81
+    },
+    {
+      "path": "fedg2c/edge_model.py",
+      "symbol": "MaskedEncodingBranch.forward",
+      "line": 18
+    },
+    {
+      "path": "fedg2c/model.py",
+      "symbol": "FeatureAdapter.forward",
+      "line": 25
+    },
+    {
+      "path": "fedg2c/model.py",
+      "symbol": "SharedBackbone.forward",
+      "line": 73
+    },
+    {
+      "path": "fedg2c/structural_encoding.py",
+      "symbol": "random_walk_encoding",
+      "line": 12
+    },
+    {
+      "path": "fedg2c/graph_predictor.py",
+      "symbol": "GraphSAGEPredictor.forward",
+      "line": 22
+    },
+    {
+      "path": "fedg2c/node_predictor.py",
+      "symbol": "NodeRepresentationPredictor.forward",
+      "line": 31
+    },
+    {
+      "path": "fedg2c/edge_client.py",
+      "symbol": "EdgePredictionClient._summary",
+      "line": 75
+    },
+    {
+      "path": "fedg2c/edge_client.py",
+      "symbol": "EdgePredictionClient.get_local_message",
+      "line": 29
+    },
+    {
+      "path": "fedg2c/messages.py",
+      "symbol": "client_message",
+      "line": 35
+    },
+    {
+      "path": "fedg2c/model.py",
+      "symbol": "EdgePassingGraphEncoder.encode",
+      "line": 44
+    },
+    {
+      "path": "fedg2c/context.py",
+      "symbol": "structural_relations",
+      "line": 119
+    },
+    {
+      "path": "fedg2c/composer.py",
+      "symbol": "RelationComposer.forward",
+      "line": 47
+    },
+    {
+      "path": "fedg2c/model.py",
+      "symbol": "SharedBackbone.encode_experts",
+      "line": 70
+    },
+    {
+      "path": "model/graph_encoders.py",
+      "symbol": "GraphEncoder.forward",
+      "line": 153
+    },
+    {
+      "path": "fedg2c/composer.py",
+      "symbol": "head_rms",
+      "line": 14
+    },
+    {
+      "path": "fedg2c/composer.py",
+      "symbol": "hypernetwork_contract",
+      "line": 20
+    },
+    {
+      "path": "aggregate_fedg2c.py",
+      "symbol": "main",
+      "line": 12
+    },
+    {
+      "path": "fedg2c/response_server.py",
+      "symbol": "ResponsePreservingServer",
+      "line": 34
+    },
+    {
+      "path": "fedg2c/response_server.py",
+      "symbol": "mix_parameters",
+      "line": 21
+    },
+    {
+      "path": "fedg2c/server_probes.py",
+      "symbol": "sample_probe_bank",
+      "line": 32
+    },
+    {
+      "path": "fedg2c/server_probes.py",
+      "symbol": "ProbeEvaluator",
+      "line": 66
+    },
+    {
+      "path": "fedg2c/response_server.py",
+      "symbol": "ResponsePreservingServer.execute",
+      "line": 107
+    },
+    {
+      "path": "fedg2c/server_io.py",
+      "symbol": "load_uploads",
+      "line": 22
+    },
+    {
+      "path": "fedg2c/messages.py",
+      "symbol": "states_from_client_messages",
+      "line": 41
+    },
+    {
+      "path": "fedg2c/response_server.py",
+      "symbol": "ResponsePreservingServer.prepare_states",
+      "line": 46
+    },
+    {
+      "path": "fedg2c/response_server.py",
+      "symbol": "distribution",
+      "line": 14
+    },
+    {
+      "path": "fedg2c/server_probes.py",
+      "symbol": "RelationProbe",
+      "line": 18
+    },
+    {
+      "path": "fedg2c/response_server.py",
+      "symbol": "ResponsePreservingServer.reference_cache",
+      "line": 74
+    },
+    {
+      "path": "fedg2c/response_server.py",
+      "symbol": "ResponsePreservingServer.evaluate_state",
+      "line": 66
+    },
+    {
+      "path": "fedg2c/response_server.py",
+      "symbol": "ResponsePreservingServer.objective",
+      "line": 88
+    },
+    {
+      "path": "fedg2c/response_server.py",
+      "symbol": "ResponsePreservingServer.matching_terms",
+      "line": 78
+    },
+    {
+      "path": "fedg2c/response_server.py",
+      "symbol": "ResponsePreservingServer.diagnostics",
+      "line": 100
+    },
+    {
+      "path": "fedg2c/server_io.py",
+      "symbol": "save_aggregation",
+      "line": 73
+    },
+    {
+      "path": "fedg2c/server_probes.py",
+      "symbol": "ProbeEvaluator.forward",
+      "line": 71
+    },
+    {
+      "path": "fedg2c/server_probes.py",
+      "symbol": "pair_readout",
+      "line": 60
+    },
+    {
+      "path": "fedg2c/target_train.py",
+      "symbol": "run_target",
+      "line": 73
+    },
+    {
+      "path": "fedg2c/target_model.py",
+      "symbol": "load_shared",
+      "line": 44
+    },
+    {
+      "path": "fedg2c/target_model.py",
+      "symbol": "TargetModel",
+      "line": 91
+    },
+    {
+      "path": "finetune_fedg2c.py",
+      "symbol": "main",
+      "line": 10
+    },
+    {
+      "path": "fedg2c/target_data.py",
+      "symbol": "load_target_manifest",
+      "line": 18
+    },
+    {
+      "path": "fedg2c/target_data.py",
+      "symbol": "TargetSample",
+      "line": 11
+    },
+    {
+      "path": "fedg2c/target_model.py",
+      "symbol": "TargetModel.__init__",
+      "line": 92
+    },
+    {
+      "path": "fedg2c/target_model.py",
+      "symbol": "install_lora",
+      "line": 74
+    },
+    {
+      "path": "fedg2c/target_model.py",
+      "symbol": "ResidualAdapter.__init__",
+      "line": 63
+    },
+    {
+      "path": "fedg2c/target_model.py",
+      "symbol": "TargetModel.train",
+      "line": 129
+    },
+    {
+      "path": "fedg2c/target_train.py",
+      "symbol": "predict",
+      "line": 58
+    },
+    {
+      "path": "fedg2c/target_train.py",
+      "symbol": "classification_loss",
+      "line": 14
+    },
+    {
+      "path": "fedg2c/target_train.py",
+      "symbol": "evaluate",
+      "line": 67
+    },
+    {
+      "path": "fedg2c/target_train.py",
+      "symbol": "metrics",
+      "line": 39
+    },
+    {
+      "path": "fedg2c/target_model.py",
+      "symbol": "TargetModel.frozen_base_unchanged",
+      "line": 162
+    },
+    {
+      "path": "fedg2c/target_model.py",
+      "symbol": "TargetModel.parameter_report",
+      "line": 165
+    },
+    {
+      "path": "fedg2c/target_model.py",
+      "symbol": "TargetModel.forward",
+      "line": 137
+    },
+    {
+      "path": "fedg2c/target_model.py",
+      "symbol": "ResidualAdapter.forward",
+      "line": 70
+    },
+    {
+      "path": "fedg2c/vendor/loralib/layers.py",
+      "symbol": "Linear.forward",
+      "line": 144
+    },
+    {
+      "path": "fedg2c/target_model.py",
+      "symbol": "TargetModel.alpha",
+      "line": 134
+    }
+  ],
+  "pages": [
+    {
+      "stage": "a",
+      "height": 7482,
+      "messages": [
+        {
+          "number": "A01",
+          "title": "EdgePredictionClient(...)",
+          "detail": "构造客户端；deepcopy(shared)",
+          "source": [
+            "fedg2c/edge_client.py",
+            "EdgePredictionClient.__init__",
+            10
+          ],
+          "y": 623
+        },
+        {
+          "number": "A02",
+          "title": "NodewisePredictionModel(...)",
+          "detail": "建立主分支、动量副本和私有预测器",
+          "source": [
+            "fedg2c/edge_model.py",
+            "NodewisePredictionModel.__init__",
+            44
+          ],
+          "y": 731
+        },
+        {
+          "number": "A03",
+          "title": "set_pretrain_model(state)",
+          "detail": "加载本轮共同的共享模型",
+          "source": [
+            "fedg2c/edge_client.py",
+            "EdgePredictionClient.set_pretrain_model",
+            16
+          ],
+          "y": 977
+        },
+        {
+          "number": "A04",
+          "title": "main_branch.shared.load_state_dict(...) ",
+          "detail": "仅覆盖共享参数；私有模块继续保留",
+          "source": [
+            "fedg2c/edge_client.py",
+            "EdgePredictionClient.set_pretrain_model",
+            16
+          ],
+          "y": 1085
+        },
+        {
+          "number": "A05",
+          "title": "reset_momentum()",
+          "detail": "同步整条主分支到动量分支",
+          "source": [
+            "fedg2c/edge_model.py",
+            "NodewisePredictionModel.reset_momentum",
+            68
+          ],
+          "y": 1193
+        },
+        {
+          "number": "A06",
+          "title": "load_state_dict(main_branch.state_dict())",
+          "detail": "包括主分支共享权重与私有输入适配器",
+          "source": [
+            "fedg2c/edge_model.py",
+            "NodewisePredictionModel.reset_momentum",
+            68
+          ],
+          "y": 1301
+        },
+        {
+          "number": "A07",
+          "title": "pretrain(graphs_factory, ...)",
+          "detail": "每次调用新建 AdamW；model.train()",
+          "source": [
+            "fedg2c/edge_client.py",
+            "EdgePredictionClient.pretrain",
+            35
+          ],
+          "y": 1409
+        },
+        {
+          "number": "A08",
+          "title": "NeighborhoodEdgeSampler(graph)",
+          "detail": "每张 graph 建立一次邻接采样器",
+          "source": [
+            "fedg2c/context.py",
+            "ContextSampler.__init__",
+            67
+          ],
+          "y": 1622
+        },
+        {
+          "number": "A09",
+          "title": "sample_edge_view(config, channels, rng)",
+          "detail": "每个 view 重新采样",
+          "source": [
+            "fedg2c/edge_views.py",
+            "NeighborhoodEdgeSampler.sample_edge_view",
+            80
+          ],
+          "y": 1835
+        },
+        {
+          "number": "A10",
+          "title": "neighborhood() → induced_view()",
+          "detail": "取根节点的有界局部参考图",
+          "source": [
+            "fedg2c/edge_views.py",
+            "NeighborhoodEdgeSampler.neighborhood",
+            65
+          ],
+          "y": 1943
+        },
+        {
+          "number": "A11",
+          "title": "mask_edges() → neighborhood() → sample_feature_keep()",
+          "detail": "先遮边，再在可见边上选 q，最后采样通道掩码",
+          "source": [
+            "fedg2c/edge_views.py",
+            "mask_edges",
+            29
+          ],
+          "y": 2051
+        },
+        {
+          "number": "A12",
+          "title": "EdgePredictionPair",
+          "detail": "reference / visible 同节点顺序；q[Q]、feature_keep[C]",
+          "source": [
+            "fedg2c/edge_views.py",
+            "EdgePredictionPair",
+            15
+          ],
+          "y": 2159
+        },
+        {
+          "number": "A13",
+          "title": "optimizer.zero_grad(set_to_none=True)",
+          "detail": "清除上一步梯度",
+          "source": [
+            "fedg2c/edge_client.py",
+            "EdgePredictionClient.pretrain",
+            35
+          ],
+          "y": 2243
+        },
+        {
+          "number": "A14",
+          "title": "forward(pair)",
+          "detail": "q 为可见图局部查询索引",
+          "source": [
+            "fedg2c/edge_model.py",
+            "NodewisePredictionModel.forward",
+            81
+          ],
+          "y": 2351
+        },
+        {
+          "number": "A15",
+          "title": "forward(visible_view, feature_keep)",
+          "detail": "只使用遮边后的可见图",
+          "source": [
+            "fedg2c/edge_model.py",
+            "MaskedEncodingBranch.forward",
+            18
+          ],
+          "y": 2459
+        },
+        {
+          "number": "A16",
+          "title": "FeatureAdapter.forward(raw)",
+          "detail": "连续：先遮原特征再投影；离散：先嵌入再遮通道",
+          "source": [
+            "fedg2c/model.py",
+            "FeatureAdapter.forward",
+            25
+          ],
+          "y": 2567
+        },
+        {
+          "number": "A17",
+          "title": "ref A-S：SharedBackbone.forward(x, edges, edge)",
+          "detail": "私有 node / edge adapter 将特征对齐到 d 维",
+          "source": [
+            "fedg2c/model.py",
+            "SharedBackbone.forward",
+            73
+          ],
+          "y": 2675
+        },
+        {
+          "number": "A18",
+          "title": "main_z [N,d]（经 main_branch 返回）",
+          "detail": "按原节点顺序排列的可见图表示",
+          "source": [
+            "fedg2c/edge_model.py",
+            "NodewisePredictionModel.forward",
+            81
+          ],
+          "y": 2783
+        },
+        {
+          "number": "A19",
+          "title": "random_walk_encoding(visible_edges, ...)",
+          "detail": "遮边后重算位置 P[N,L]；L=len(walk_steps)",
+          "source": [
+            "fedg2c/structural_encoding.py",
+            "random_walk_encoding",
+            12
+          ],
+          "y": 2867
+        },
+        {
+          "number": "A20",
+          "title": "GraphSAGEPredictor.forward(main_z, P, q, visible_edges)",
+          "detail": "嵌入 + 位置投影 → SAGEConv → ReLU → output → [q]",
+          "source": [
+            "fedg2c/graph_predictor.py",
+            "GraphSAGEPredictor.forward",
+            22
+          ],
+          "y": 3080
+        },
+        {
+          "number": "A21",
+          "title": "NodeRepresentationPredictor.forward(main_z, P, q)",
+          "detail": "Transformer 对照分支",
+          "source": [
+            "fedg2c/node_predictor.py",
+            "NodeRepresentationPredictor.forward",
+            31
+          ],
+          "y": 3300
+        },
+        {
+          "number": "A22",
+          "title": "prediction [Q,d]",
+          "detail": "与 q 的顺序一致",
+          "source": null,
+          "y": 3448
+        },
+        {
+          "number": "A23",
+          "title": "forward(reference_view)",
+          "detail": "完整局部参考边；不传 feature_keep",
+          "source": [
+            "fedg2c/edge_model.py",
+            "MaskedEncodingBranch.forward",
+            18
+          ],
+          "y": 3637
+        },
+        {
+          "number": "A24",
+          "title": "ref A-S：动量副本 SharedBackbone.forward(...) ",
+          "detail": "使用 EMA 参数；与主分支不是同一权重实例",
+          "source": [
+            "fedg2c/model.py",
+            "SharedBackbone.forward",
+            73
+          ],
+          "y": 3745
+        },
+        {
+          "number": "A25",
+          "title": "reference_z [N,d]",
+          "detail": "",
+          "source": null,
+          "y": 3853
+        },
+        {
+          "number": "A26",
+          "title": "reference_z [N,d]",
+          "detail": "后续 layer_norm(reference_z)[q] → reference[Q,d]",
+          "source": [
+            "fedg2c/edge_model.py",
+            "NodewisePredictionModel.forward",
+            81
+          ],
+          "y": 3937
+        },
+        {
+          "number": "A27",
+          "title": "F.smooth_l1_loss(prediction, reference)",
+          "detail": "reference 已逐节点 LayerNorm 并索引 q；损失为标量",
+          "source": [
+            "fedg2c/edge_model.py",
+            "NodewisePredictionModel.forward",
+            81
+          ],
+          "y": 4061
+        },
+        {
+          "number": "A28",
+          "title": "loss, outputs",
+          "detail": "outputs 内的 prediction / reference 已 detach",
+          "source": [
+            "fedg2c/edge_model.py",
+            "NodewisePredictionModel.forward",
+            81
+          ],
+          "y": 4169
+        },
+        {
+          "number": "A29",
+          "title": "loss.backward() → clip_grad_norm_(..., 5) ",
+          "detail": "更新目标：主分支共享参数 + 私有适配器 + 预测器",
+          "source": [
+            "fedg2c/edge_client.py",
+            "EdgePredictionClient.pretrain",
+            35
+          ],
+          "y": 4253
+        },
+        {
+          "number": "A30",
+          "title": "optimizer.step()",
+          "detail": "先完成主分支优化",
+          "source": [
+            "fedg2c/edge_client.py",
+            "EdgePredictionClient.pretrain",
+            35
+          ],
+          "y": 4361
+        },
+        {
+          "number": "A31",
+          "title": "update_momentum()",
+          "detail": "必须在 optimizer.step() 之后",
+          "source": [
+            "fedg2c/edge_model.py",
+            "NodewisePredictionModel.update_momentum",
+            73
+          ],
+          "y": 4469
+        },
+        {
+          "number": "A32",
+          "title": "EMA 参数；直接复制 buffers",
+          "detail": "θ_ema ← m·θ_ema + (1−m)·θ_main",
+          "source": [
+            "fedg2c/edge_model.py",
+            "NodewisePredictionModel.update_momentum",
+            73
+          ],
+          "y": 4577
+        },
+        {
+          "number": "A33",
+          "title": "_summary(metrics, references)",
+          "detail": "本地训练报告；停止条件达到则返回",
+          "source": [
+            "fedg2c/edge_client.py",
+            "EdgePredictionClient._summary",
+            75
+          ],
+          "y": 4765
+        },
+        {
+          "number": "A34",
+          "title": "get_pretrain_model(); get_local_message()",
+          "detail": "前者保存磁盘；后者供联邦入口上传",
+          "source": [
+            "fedg2c/edge_client.py",
+            "EdgePredictionClient.get_local_message",
+            29
+          ],
+          "y": 4849
+        },
+        {
+          "number": "A35",
+          "title": "共享 state / {num_samples:1, weight:[(name,tensor)]}",
+          "detail": "只导出 main_branch.shared → 进入阶段 B",
+          "source": [
+            "fedg2c/messages.py",
+            "client_message",
+            35
+          ],
+          "y": 4957
+        },
+        {
+          "number": "AS01",
+          "title": "forward(x[N,d], edge_index[2,E], edge_attr?)",
+          "detail": "",
+          "source": [
+            "fedg2c/model.py",
+            "SharedBackbone.forward",
+            73
+          ],
+          "y": 5553
+        },
+        {
+          "number": "AS02",
+          "title": "encode_experts(x, edges, edge)",
+          "detail": "",
+          "source": [
+            "fedg2c/model.py",
+            "SharedBackbone.encode_experts",
+            70
+          ],
+          "y": 5661
+        },
+        {
+          "number": "AS03",
+          "title": "GraphEncoder.forward(...) → self.encode(...) ",
+          "detail": "通过继承分派到 EdgePassingGraphEncoder.encode",
+          "source": [
+            "model/graph_encoders.py",
+            "GraphEncoder.forward",
+            153
+          ],
+          "y": 5874
+        },
+        {
+          "number": "AS04",
+          "title": "逐层 layer → norm → 非末层 activation/dropout",
+          "detail": "mysage 将 edge_attr 传给 EdgeAwareSAGEConv",
+          "source": [
+            "fedg2c/model.py",
+            "EdgePassingGraphEncoder.encode",
+            44
+          ],
+          "y": 5982
+        },
+        {
+          "number": "AS05",
+          "title": "专家节点表示 [N,d]",
+          "detail": "",
+          "source": null,
+          "y": 6090
+        },
+        {
+          "number": "AS06",
+          "title": "torch.stack(expert_outputs, dim=1)",
+          "detail": "得到 E[N,M,d]；每个节点有 M 个专家 token",
+          "source": [
+            "fedg2c/model.py",
+            "SharedBackbone.encode_experts",
+            70
+          ],
+          "y": 6214
+        },
+        {
+          "number": "AS07",
+          "title": "structural_relations(edges, N)",
+          "detail": "self / direct_edge / two_hop 三通道",
+          "source": [
+            "fedg2c/context.py",
+            "structural_relations",
+            119
+          ],
+          "y": 6322
+        },
+        {
+          "number": "AS08",
+          "title": "R[N,N,3]",
+          "detail": "",
+          "source": null,
+          "y": 6430
+        },
+        {
+          "number": "AS09",
+          "title": "forward(E[N,M,d], R[N,N,3])",
+          "detail": "展平 token[T,d]；Q/K/V 按头拆分",
+          "source": [
+            "fedg2c/composer.py",
+            "RelationComposer.forward",
+            47
+          ],
+          "y": 6514
+        },
+        {
+          "number": "AS10",
+          "title": "QKᵀ / √(d/H) + relation(R)",
+          "detail": "scores[H,T,T]；节点关系偏置扩展到专家 token 对",
+          "source": [
+            "fedg2c/composer.py",
+            "RelationComposer.forward",
+            47
+          ],
+          "y": 6622
+        },
+        {
+          "number": "AS11",
+          "title": "head_rms(scores, mask)",
+          "detail": "跨头 RMS 归一化得到 code[H,T,T]",
+          "source": [
+            "fedg2c/composer.py",
+            "head_rms",
+            14
+          ],
+          "y": 6730
+        },
+        {
+          "number": "AS12",
+          "title": "hypernetwork_contract(code, V)",
+          "detail": "两次收缩；默认中间 ReLU；out[T,H,d/H]",
+          "source": [
+            "fedg2c/composer.py",
+            "hypernetwork_contract",
+            20
+          ],
+          "y": 6838
+        },
+        {
+          "number": "AS13",
+          "title": "output → token 残差 → LayerNorm → 专家均值",
+          "detail": "[T,d] → [N,M,d] → z[N,d]",
+          "source": [
+            "fedg2c/composer.py",
+            "RelationComposer.forward",
+            47
+          ],
+          "y": 6946
+        },
+        {
+          "number": "AS14",
+          "title": "z[N,d]（经 SharedBackbone 返回）",
+          "detail": "",
+          "source": null,
+          "y": 7054
+        }
+      ]
+    },
+    {
+      "stage": "b",
+      "height": 6912,
+      "messages": [
+        {
+          "number": "B01",
+          "title": "execute(uploads, round_id)",
+          "detail": "联邦 messages 映射；或独立入口的 state 列表",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.execute",
+            107
+          ],
+          "y": 623
+        },
+        {
+          "number": "B02",
+          "title": "states_from_client_messages(uploads)",
+          "detail": "校验 num_samples=1 与 weight；还原共享状态列表",
+          "source": [
+            "fedg2c/messages.py",
+            "states_from_client_messages",
+            41
+          ],
+          "y": 836
+        },
+        {
+          "number": "B03",
+          "title": "states = [θ₁, …, θK]",
+          "detail": "",
+          "source": null,
+          "y": 944
+        },
+        {
+          "number": "B04",
+          "title": "prepare_states(uploads)",
+          "detail": "校验 keys、shape、dtype、有限值；detach / clone 到服务器设备",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.prepare_states",
+            46
+          ],
+          "y": 1068
+        },
+        {
+          "number": "B05",
+          "title": "distribution(...); mix_parameters(states, baseline, names)",
+          "detail": "baseline 和参考权重 ρ 默认均匀；先形成固定平均 θ_base",
+          "source": [
+            "fedg2c/response_server.py",
+            "distribution",
+            14
+          ],
+          "y": 1176
+        },
+        {
+          "number": "B06",
+          "title": "return θ_base, report",
+          "detail": "optimization_steps=0；不创建探针；本分支结束",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.execute",
+            107
+          ],
+          "y": 1389
+        },
+        {
+          "number": "B07",
+          "title": "sample_probe_bank(... calibration_graphs, seed)",
+          "detail": "随后调用 diagnostic_graphs，seed+500009；seed=cfg.seed+round_id·1000003",
+          "source": [
+            "fedg2c/server_probes.py",
+            "sample_probe_bank",
+            32
+          ],
+          "y": 1585
+        },
+        {
+          "number": "B08",
+          "title": "SBM 图 → 高斯 x → structural_relations → pairs / directions",
+          "detail": "共享空间输入 x[N,d]；关系 R[N,N,3]；方向 Δ[D,N,N]",
+          "source": [
+            "fedg2c/server_probes.py",
+            "sample_probe_bank",
+            32
+          ],
+          "y": 1693
+        },
+        {
+          "number": "B09",
+          "title": "train / diagnostic 两套独立探针库",
+          "detail": "train 用于优化；diagnostic 仅用于报告",
+          "source": [
+            "fedg2c/server_probes.py",
+            "RelationProbe",
+            18
+          ],
+          "y": 1801
+        },
+        {
+          "number": "B10",
+          "title": "reference_cache(states, train)",
+          "detail": "随后 reference_cache(states, diagnostic)；均在 no_grad 下",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.reference_cache",
+            74
+          ],
+          "y": 1885
+        },
+        {
+          "number": "B11",
+          "title": "ref B-E：evaluate_state(θᵢ, bank)",
+          "detail": "functional_call 注入 θᵢ；参考值只计算一次并缓存",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.evaluate_state",
+            66
+          ],
+          "y": 2098
+        },
+        {
+          "number": "B12",
+          "title": "reference outputs / responses",
+          "detail": "堆叠为 [K,G,P] / [K,G,D,P]（响应不可用时 D=0）",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.reference_cache",
+            74
+          ],
+          "y": 2206
+        },
+        {
+          "number": "B13",
+          "title": "Adam([logits], lr=cfg.lr)",
+          "detail": "logits = log(baseline)，requires_grad=True",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.execute",
+            107
+          ],
+          "y": 2475
+        },
+        {
+          "number": "B14",
+          "title": "zero_grad(set_to_none=True)",
+          "detail": "",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.execute",
+            107
+          ],
+          "y": 2688
+        },
+        {
+          "number": "B15",
+          "title": "objective(logits, states, train, refs, baseline, ρ)",
+          "detail": "w = softmax(logits) ∈ R^K，wᵢ≥0 且和为 1",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.objective",
+            88
+          ],
+          "y": 2796
+        },
+        {
+          "number": "B16",
+          "title": "mix_parameters(states, w, parameter_names)",
+          "detail": "每个参数张量 θ(w)=Σwᵢθᵢ；保持可微计算图",
+          "source": [
+            "fedg2c/response_server.py",
+            "mix_parameters",
+            21
+          ],
+          "y": 2904
+        },
+        {
+          "number": "B17",
+          "title": "候选 state θ(w)",
+          "detail": "共享 buffers 必须相同，直接沿用",
+          "source": [
+            "fedg2c/response_server.py",
+            "mix_parameters",
+            21
+          ],
+          "y": 3012
+        },
+        {
+          "number": "B18",
+          "title": "ref B-E：evaluate_state(θ(w), train, measure_response)",
+          "detail": "response 模式测中心差分；output_only 仅测基准输出",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.evaluate_state",
+            66
+          ],
+          "y": 3096
+        },
+        {
+          "number": "B19",
+          "title": "candidate outputs [G,P] / responses [G,D,P]",
+          "detail": "梯度可回传到 w 与 logits",
+          "source": null,
+          "y": 3204
+        },
+        {
+          "number": "B20",
+          "title": "matching_terms(candidate, refs, ρ)",
+          "detail": "分别计算各客户端 MSE，再按固定 ρ 加权求和",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.matching_terms",
+            78
+          ],
+          "y": 3288
+        },
+        {
+          "number": "B21",
+          "title": "loss = λout·Lout + λprior·||w−baseline||²",
+          "detail": "response 模式另加 λresponse·Lresponse",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.objective",
+            88
+          ],
+          "y": 3396
+        },
+        {
+          "number": "B22",
+          "title": "loss.backward(); 检查 logits.grad",
+          "detail": "梯度经候选模型的 functional_call 与参数凸组合回传",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.execute",
+            107
+          ],
+          "y": 3504
+        },
+        {
+          "number": "B23",
+          "title": "step()",
+          "detail": "只改变 logits；states 与参考缓存不变",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.execute",
+            107
+          ],
+          "y": 3612
+        },
+        {
+          "number": "B24",
+          "title": "weights=softmax(logits); mix_parameters(...)",
+          "detail": "使用最后一个配置步得到的权重形成 final",
+          "source": [
+            "fedg2c/response_server.py",
+            "mix_parameters",
+            21
+          ],
+          "y": 3760
+        },
+        {
+          "number": "B25",
+          "title": "diagnostics(base/train) → diagnostics(final/train)",
+          "detail": "随后 base/diagnostic → final/diagnostic；复用 ref B-E",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.diagnostics",
+            100
+          ],
+          "y": 3868
+        },
+        {
+          "number": "B26",
+          "title": "return final.detach().cpu(), report",
+          "detail": "同时保存 last_probe_banks；诊断探针不用于挑选权重",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.execute",
+            107
+          ],
+          "y": 3976
+        },
+        {
+          "number": "B27",
+          "title": "save_aggregation(folder, state, ..., last_probe_banks)",
+          "detail": "写 shared_backbone.pt / aggregation_report.json / run_metadata.json；有探针时另写 server_probes.pt",
+          "source": [
+            "fedg2c/server_io.py",
+            "save_aggregation",
+            73
+          ],
+          "y": 4100
+        },
+        {
+          "number": "BE01",
+          "title": "functional_call(evaluator, {'shared.'+k: tensor}, ...)",
+          "detail": "严格注入参数，不 load_state_dict，不切断候选梯度",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.evaluate_state",
+            66
+          ],
+          "y": 4822
+        },
+        {
+          "number": "BE02",
+          "title": "encode_experts(probe.x, probe.edge_index, None)",
+          "detail": "每个候选 / 探针只执行一次专家编码",
+          "source": [
+            "fedg2c/model.py",
+            "SharedBackbone.encode_experts",
+            70
+          ],
+          "y": 4930
+        },
+        {
+          "number": "BE03",
+          "title": "h[N,M,d]",
+          "detail": "",
+          "source": null,
+          "y": 5038
+        },
+        {
+          "number": "BE04",
+          "title": "forward(h, R, relation_gate=ones[N,N])",
+          "detail": "基准 gate G₀=1",
+          "source": [
+            "fedg2c/composer.py",
+            "RelationComposer.forward",
+            47
+          ],
+          "y": 5122
+        },
+        {
+          "number": "BE05",
+          "title": "z₀[N,d]",
+          "detail": "",
+          "source": null,
+          "y": 5230
+        },
+        {
+          "number": "BE06",
+          "title": "pair_readout(z₀, pairs[P,2])",
+          "detail": "节点向量 L2 归一化，再算每对内积",
+          "source": [
+            "fedg2c/server_probes.py",
+            "pair_readout",
+            60
+          ],
+          "y": 5314
+        },
+        {
+          "number": "BE07",
+          "title": "output[P]",
+          "detail": "余弦相似度；不经过任务分类头",
+          "source": null,
+          "y": 5422
+        },
+        {
+          "number": "BE08",
+          "title": "forward(h, R, relation_gate=1+εΔ)",
+          "detail": "只改变关系偏置 gate；专家 h 与图边保持不变",
+          "source": [
+            "fedg2c/server_probes.py",
+            "ProbeEvaluator.forward",
+            71
+          ],
+          "y": 5716
+        },
+        {
+          "number": "BE09",
+          "title": "positive[N,d]",
+          "detail": "",
+          "source": null,
+          "y": 5824
+        },
+        {
+          "number": "BE10",
+          "title": "forward(h, R, relation_gate=1−εΔ)",
+          "detail": "",
+          "source": [
+            "fedg2c/server_probes.py",
+            "ProbeEvaluator.forward",
+            71
+          ],
+          "y": 5908
+        },
+        {
+          "number": "BE11",
+          "title": "negative[N,d]",
+          "detail": "",
+          "source": null,
+          "y": 6016
+        },
+        {
+          "number": "BE12",
+          "title": "pair_readout(positive, pairs); pair_readout(negative, pairs)",
+          "detail": "",
+          "source": [
+            "fedg2c/server_probes.py",
+            "pair_readout",
+            60
+          ],
+          "y": 6100
+        },
+        {
+          "number": "BE13",
+          "title": "s₊[P], s₋[P]",
+          "detail": "",
+          "source": null,
+          "y": 6208
+        },
+        {
+          "number": "BE14",
+          "title": "response_Δ = (s₊−s₋)/(2ε)",
+          "detail": "中心差分，测关系条件组合对扰动的敏感度",
+          "source": [
+            "fedg2c/server_probes.py",
+            "ProbeEvaluator.forward",
+            71
+          ],
+          "y": 6292
+        },
+        {
+          "number": "BE15",
+          "title": "output[P], response[D,P]",
+          "detail": "measure_response=False 时 response[0,P]",
+          "source": [
+            "fedg2c/server_probes.py",
+            "ProbeEvaluator.forward",
+            71
+          ],
+          "y": 6480
+        },
+        {
+          "number": "BE16",
+          "title": "torch.stack(outputs), torch.stack(responses)",
+          "detail": "得到 [G,P]、[G,D,P]；返回 reference_cache / objective / diagnostics",
+          "source": [
+            "fedg2c/response_server.py",
+            "ResponsePreservingServer.evaluate_state",
+            66
+          ],
+          "y": 6604
+        }
+      ]
+    },
+    {
+      "stage": "c",
+      "height": 8403,
+      "messages": [
+        {
+          "number": "C01",
+          "title": "load_target_manifest(manifest_path, config)",
+          "detail": "显式校验划分；图任务保留整图，节点任务取局部图并重映射 root",
+          "source": [
+            "fedg2c/target_data.py",
+            "load_target_manifest",
+            18
+          ],
+          "y": 623
+        },
+        {
+          "number": "C02",
+          "title": "manifest, splits{'train','valid','test'}",
+          "detail": "每个 TargetSample 含 view、label、root、sample_id",
+          "source": [
+            "fedg2c/target_data.py",
+            "TargetSample",
+            11
+          ],
+          "y": 731
+        },
+        {
+          "number": "C03",
+          "title": "load_shared(checkpoint)",
+          "detail": "校验 B 阶段、schema、relation_schema 和 state_digest；构造并加载 SharedBackbone",
+          "source": [
+            "fedg2c/target_model.py",
+            "load_shared",
+            44
+          ],
+          "y": 815
+        },
+        {
+          "number": "C04",
+          "title": "shared, shared_config, metadata",
+          "detail": "",
+          "source": null,
+          "y": 923
+        },
+        {
+          "number": "C05",
+          "title": "TargetModel(shared, shared_config, feature_schema, task, config)",
+          "detail": "",
+          "source": [
+            "fedg2c/target_model.py",
+            "TargetModel.__init__",
+            92
+          ],
+          "y": 1007
+        },
+        {
+          "number": "C06",
+          "title": "shared.requires_grad_(False).eval(); 记录原基座摘要",
+          "detail": "新建目标域 node/edge adapter、分类 head 和可选 local_encoder / alpha_logit",
+          "source": [
+            "fedg2c/target_model.py",
+            "TargetModel.__init__",
+            92
+          ],
+          "y": 1115
+        },
+        {
+          "number": "C07",
+          "title": "install_lora(shared.composer, config)",
+          "detail": "仅替换 query / key 为 LoRALinear；复制并冻结原 W/b，merge_weights=False",
+          "source": [
+            "fedg2c/target_model.py",
+            "install_lora",
+            74
+          ],
+          "y": 1328
+        },
+        {
+          "number": "C08",
+          "title": "ResidualAdapter(dim=d, bottleneck=b)",
+          "detail": "down: d→b，up: b→d；up 权重和偏置初始化为零",
+          "source": [
+            "fedg2c/target_model.py",
+            "ResidualAdapter.__init__",
+            63
+          ],
+          "y": 1548
+        },
+        {
+          "number": "C09",
+          "title": "prompt = nn.Parameter(zeros(1,1,d))",
+          "detail": "在专家 token 空间共享一条可学习向量",
+          "source": [
+            "fedg2c/target_model.py",
+            "TargetModel.__init__",
+            92
+          ],
+          "y": 1768
+        },
+        {
+          "number": "C10",
+          "title": "保留共同私有模块；不安装上述三种适配",
+          "detail": "",
+          "source": [
+            "fedg2c/target_model.py",
+            "TargetModel.__init__",
+            92
+          ],
+          "y": 1988
+        },
+        {
+          "number": "C11",
+          "title": "AdamW([p for p in model.parameters() if p.requires_grad])",
+          "detail": "训练参数见 TargetModel.parameter_report()；每次 run_target 新建优化器",
+          "source": [
+            "fedg2c/target_train.py",
+            "run_target",
+            73
+          ],
+          "y": 2278
+        },
+        {
+          "number": "C12",
+          "title": "train()",
+          "detail": "内部 super().train() 后把 self.shared 设回 eval；仍允许梯度穿过冻结基座",
+          "source": [
+            "fedg2c/target_model.py",
+            "TargetModel.train",
+            129
+          ],
+          "y": 2491
+        },
+        {
+          "number": "C13",
+          "title": "torch.randperm(train_size)",
+          "detail": "打乱训练样本顺序，再按 batch_size 分组",
+          "source": [
+            "fedg2c/target_train.py",
+            "run_target",
+            73
+          ],
+          "y": 2599
+        },
+        {
+          "number": "C14",
+          "title": "predict(model, samples, device) → ref C-F",
+          "detail": "predict 内逐样本调用 model(view,root)，最后 torch.cat；不是图拼接 batch",
+          "source": [
+            "fedg2c/target_train.py",
+            "predict",
+            58
+          ],
+          "y": 2812
+        },
+        {
+          "number": "C15",
+          "title": "逐样本 logits[1,O]；predict 拼成 logits[B,O]",
+          "detail": "labels[B,1]（多分类）或 labels[B,O]（二分类 / 多标签）",
+          "source": [
+            "fedg2c/target_train.py",
+            "predict",
+            58
+          ],
+          "y": 2920
+        },
+        {
+          "number": "C16",
+          "title": "classification_loss(logits, labels, objective)",
+          "detail": "multiclass：cross_entropy；其他：有限标签 mask + BCEWithLogits；count=0 则跳过该 batch",
+          "source": [
+            "fedg2c/target_train.py",
+            "classification_loss",
+            14
+          ],
+          "y": 3004
+        },
+        {
+          "number": "C17",
+          "title": "zero_grad(set_to_none=True)",
+          "detail": "源码位置在前向和 loss 计算之后",
+          "source": [
+            "fedg2c/target_train.py",
+            "run_target",
+            73
+          ],
+          "y": 3217
+        },
+        {
+          "number": "C18",
+          "title": "loss.backward() → clip_grad_norm_(trainable, 5)",
+          "detail": "梯度穿过冻结算子，只有 requires_grad=True 的参数累积梯度",
+          "source": [
+            "fedg2c/target_train.py",
+            "run_target",
+            73
+          ],
+          "y": 3325
+        },
+        {
+          "number": "C19",
+          "title": "step()",
+          "detail": "更新本地私有模块和当前适配参数",
+          "source": [
+            "fedg2c/target_train.py",
+            "run_target",
+            73
+          ],
+          "y": 3433
+        },
+        {
+          "number": "C20",
+          "title": "evaluate(model, valid, device)",
+          "detail": "@torch.no_grad()；先 model.eval()，再 predict → metrics",
+          "source": [
+            "fedg2c/target_train.py",
+            "evaluate",
+            67
+          ],
+          "y": 3621
+        },
+        {
+          "number": "C21",
+          "title": "验证集逐样本 forward：ref C-F",
+          "detail": "读取 valid；不更新模型参数",
+          "source": [
+            "fedg2c/target_train.py",
+            "predict",
+            58
+          ],
+          "y": 3729
+        },
+        {
+          "number": "C22",
+          "title": "valid logits → metrics → valid['loss']",
+          "detail": "metrics 在 evaluate 内计算",
+          "source": [
+            "fedg2c/target_train.py",
+            "metrics",
+            39
+          ],
+          "y": 3837
+        },
+        {
+          "number": "C23",
+          "title": "best_state = clone(model.state_dict())",
+          "detail": "保存最小验证损失对应的权重与 best_epoch",
+          "source": [
+            "fedg2c/target_train.py",
+            "run_target",
+            73
+          ],
+          "y": 4026
+        },
+        {
+          "number": "C24",
+          "title": "load_state_dict(best_state); frozen_base_unchanged()",
+          "detail": "先恢复最佳验证检查点，再核验原共享基座摘要",
+          "source": [
+            "fedg2c/target_model.py",
+            "TargetModel.frozen_base_unchanged",
+            162
+          ],
+          "y": 4214
+        },
+        {
+          "number": "C25",
+          "title": "evaluate(model, test, device)",
+          "detail": "选择完成后才运行一次最终测试；复用 ref C-F",
+          "source": [
+            "fedg2c/target_train.py",
+            "evaluate",
+            67
+          ],
+          "y": 4322
+        },
+        {
+          "number": "C26",
+          "title": "parameter_report(); alpha()",
+          "detail": "统计本地可训练参数与实际融合系数",
+          "source": [
+            "fedg2c/target_model.py",
+            "TargetModel.parameter_report",
+            165
+          ],
+          "y": 4430
+        },
+        {
+          "number": "C27",
+          "title": "torch.save(best_state)；写 report / metadata",
+          "detail": "输出 target_model.pt、metrics.json、run_metadata.json；run_target 返回 report",
+          "source": [
+            "fedg2c/target_train.py",
+            "run_target",
+            73
+          ],
+          "y": 4538
+        },
+        {
+          "number": "CF01",
+          "title": "forward(view, root=None / local_root)",
+          "detail": "",
+          "source": [
+            "fedg2c/target_model.py",
+            "TargetModel.forward",
+            137
+          ],
+          "y": 5014
+        },
+        {
+          "number": "CF02",
+          "title": "node_adapter(view.x[N,F]); edge_adapter(edge_attr)?",
+          "detail": "离散列 embedding 求和或连续 Linear；边特征由 schema 显式控制",
+          "source": [
+            "fedg2c/model.py",
+            "FeatureAdapter.forward",
+            25
+          ],
+          "y": 5122
+        },
+        {
+          "number": "CF03",
+          "title": "x[N,d]；可选 edge[E,d]",
+          "detail": "",
+          "source": null,
+          "y": 5230
+        },
+        {
+          "number": "CF04",
+          "title": "encode_experts(x, edges, edge)",
+          "detail": "M 个冻结图专家依次前向；内部细节同 A-S 的专家部分",
+          "source": [
+            "fedg2c/model.py",
+            "SharedBackbone.encode_experts",
+            70
+          ],
+          "y": 5419
+        },
+        {
+          "number": "CF05",
+          "title": "h[N,M,d]",
+          "detail": "",
+          "source": null,
+          "y": 5527
+        },
+        {
+          "number": "CF06",
+          "title": "h = h + self.prompt[1,1,d]",
+          "detail": "广播到所有节点、所有专家 token",
+          "source": [
+            "fedg2c/target_model.py",
+            "TargetModel.forward",
+            137
+          ],
+          "y": 5716
+        },
+        {
+          "number": "CF07",
+          "title": "structural_relations(view.edge_index,N)",
+          "detail": "重新构造当前目标样本 R[N,N,3]",
+          "source": [
+            "fedg2c/context.py",
+            "structural_relations",
+            119
+          ],
+          "y": 5864
+        },
+        {
+          "number": "CF08",
+          "title": "forward(h, relations)",
+          "detail": "这里直接调用 composer；不再经过 SharedBackbone.forward",
+          "source": [
+            "fedg2c/composer.py",
+            "RelationComposer.forward",
+            47
+          ],
+          "y": 5972
+        },
+        {
+          "number": "CF09",
+          "title": "LoRALinear.forward(tokens[N·M,d])",
+          "detail": "Q/K = tokens·Wᵀ + b + (lora_alpha/r)·tokens·Aᵀ·Bᵀ",
+          "source": [
+            "fedg2c/vendor/loralib/layers.py",
+            "Linear.forward",
+            144
+          ],
+          "y": 6185
+        },
+        {
+          "number": "CF10",
+          "title": "z[N,d]",
+          "detail": "普通 / Prompt / LoRA 模式的组合表示",
+          "source": null,
+          "y": 6484
+        },
+        {
+          "number": "CF11",
+          "title": "ResidualAdapter.forward(z[N,d])",
+          "detail": "z + up(ReLU(down(z)))；瓶颈 [N,b]",
+          "source": [
+            "fedg2c/target_model.py",
+            "ResidualAdapter.forward",
+            70
+          ],
+          "y": 6673
+        },
+        {
+          "number": "CF12",
+          "title": "z_adapted[N,d]",
+          "detail": "Adapter 位于组合器之后",
+          "source": null,
+          "y": 6781
+        },
+        {
+          "number": "CF13",
+          "title": "GraphEncoder.forward(x, edges, edge) → encode(...) ",
+          "detail": "新的可训练本地编码器，不是阶段 A 的动量分支",
+          "source": [
+            "fedg2c/model.py",
+            "EdgePassingGraphEncoder.encode",
+            44
+          ],
+          "y": 7050
+        },
+        {
+          "number": "CF14",
+          "title": "local[N,d]",
+          "detail": "",
+          "source": null,
+          "y": 7158
+        },
+        {
+          "number": "CF15",
+          "title": "融合：普通分支调用 alpha()",
+          "detail": "普通：z=α·local+(1−α)·z；pure_local：直接 z=local",
+          "source": [
+            "fedg2c/target_model.py",
+            "TargetModel.alpha",
+            134
+          ],
+          "y": 7242
+        },
+        {
+          "number": "CF16",
+          "title": "z.mean(dim=0, keepdim=True)",
+          "detail": "全部节点均值 → [1,d]",
+          "source": [
+            "fedg2c/target_model.py",
+            "TargetModel.forward",
+            137
+          ],
+          "y": 7495
+        },
+        {
+          "number": "CF17",
+          "title": "z[root:root+1]",
+          "detail": "只读重映射后的目标根节点 → [1,d]",
+          "source": [
+            "fedg2c/target_model.py",
+            "TargetModel.forward",
+            137
+          ],
+          "y": 7715
+        },
+        {
+          "number": "CF18",
+          "title": "head(z[1,d])",
+          "detail": "nn.Linear：d → O；前向返回原始 logits",
+          "source": [
+            "fedg2c/target_model.py",
+            "TargetModel.forward",
+            137
+          ],
+          "y": 7863
+        },
+        {
+          "number": "CF19",
+          "title": "logits[1,O]（经 TargetModel 返回）",
+          "detail": "predict 收集 B 个样本后拼接，再在外部计算监督 loss",
+          "source": [
+            "fedg2c/target_train.py",
+            "predict",
+            58
+          ],
+          "y": 7971
+        }
+      ]
+    }
+  ]
+}

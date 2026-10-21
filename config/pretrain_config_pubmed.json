@@ -1,0 +1,7 @@
+{
+  "num_experts": 5,
+  "datasets": ["citeseer", "cora", "photo", "computers", "wikics"],
+  "pretrain_num_clients": [1, 1, 1, 1, 1],
+  "finetune_datasets": ["pubmed"],
+  "finetune_num_clients": [1]
+}

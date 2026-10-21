@@ -1,0 +1,7 @@
+{
+  "num_experts": 3,
+  "datasets": ["chemhiv", "chempcba", "proteins"],
+  "pretrain_num_clients": [1, 1, 1],
+  "finetune_datasets": ["imdb-binary"],
+  "finetune_num_clients": [1]
+}

@@ -1,0 +1,16 @@
+{
+  "hidden_dim": 64,
+  "num_experts": 4,
+  "num_heads": 4,
+  "num_layers": 2,
+  "backbone": "mysage",
+  "composer": "hypernetwork_relu",
+  "relation_condition": true,
+  "objective": "joint_embedding_prediction",
+  "max_nodes": 32,
+  "prediction_ratio": 0.25,
+  "momentum": 0.99,
+  "dropout": 0.0,
+  "lr": 0.001,
+  "weight_decay": 0.00001
+}

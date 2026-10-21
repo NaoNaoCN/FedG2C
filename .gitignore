@@ -1,0 +1,104 @@
+# 默认忽略所有文件，仅允许代码、配置文件和说明文档。
+# 允许遍历目录，确保子目录中的白名单文件可以被 Git 发现。
+*
+!*/
+
+# ===== 源代码与脚本（包括测试代码） =====
+!*.py
+!*.pyi
+!*.ipynb
+!*.sh
+!*.bash
+!*.ps1
+!*.bat
+!*.cmd
+
+# ===== 配置与依赖声明 =====
+!.gitignore
+!.gitattributes
+!.gitmodules
+!.editorconfig
+!.dockerignore
+!*.json
+!*.jsonc
+!*.yaml
+!*.yml
+!*.toml
+!*.ini
+!*.cfg
+!requirements*.txt
+!Pipfile
+!Pipfile.lock
+!poetry.lock
+!uv.lock
+!Makefile
+!Dockerfile
+!Dockerfile.*
+!.env.example
+!.env.sample
+!.env.template
+
+# ===== 说明文档、图表源文件及第三方许可 =====
+!*.md
+!*.rst
+!*.txt
+!*.drawio
+!README*
+!LICENSE
+!LICENSE.*
+!*.LICENSE
+!COPYING*
+!NOTICE*
+!AUTHORS*
+!COMMIT
+
+# ===== 数据集、数据缓存（同时匹配目录与符号链接） =====
+cache_data
+data_backup/
+partitions/
+/data
+/datasets
+
+# ===== 模型、日志与实验输出（其中的 JSON/TXT 也不提交） =====
+ckpts/
+ckpts_textual/
+checkpoints/
+logs/
+logs_*/
+outputs/
+results/
+runs/
+artifacts/
+wandb/
+mlruns/
+lightning_logs/
+/docs/review_artifacts_*/
+/docs/module_a_trace_*/one_step/
+
+# ===== Python 环境、缓存与构建产物 =====
+__pycache__/
+.venv/
+venv/
+env/
+ENV/
+.env/
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.ipynb_checkpoints/
+build/
+dist/
+*.egg-info/
+.eggs/
+htmlcov/
+
+# ===== 本地工具配置与临时文件 =====
+.vscode/
+.idea/
+.claude/
+paper_extracted.txt
+
+# 模型权重、二进制数据、图片、PDF、压缩包、备份等未列入白名单，自动忽略。

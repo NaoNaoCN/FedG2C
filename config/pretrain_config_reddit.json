@@ -1,0 +1,7 @@
+{
+  "num_experts": 3,
+  "datasets": ["cora", "citeseer", "pubmed"],
+  "pretrain_num_clients": [1, 1, 1],
+  "finetune_datasets": ["reddit"],
+  "finetune_num_clients": [1]
+}

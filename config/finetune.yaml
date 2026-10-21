@@ -1,0 +1,88 @@
+# Per-dataset fine-tuning settings used by flcore.client.Client.
+# Each entry contains only fields consumed by the active fine-tuning path.
+
+node:
+  cora:
+    finetune_epochs: 1000
+    early_stop: 50
+    batch_size: 0
+    finetune_lr: 0.0001
+  citeseer:
+    finetune_epochs: 1000
+    early_stop: 300
+    batch_size: 0
+    finetune_lr: 0.0001
+  photo:
+    finetune_epochs: 1000
+    early_stop: 200
+    batch_size: 0
+    finetune_lr: 0.0001
+  computers:
+    finetune_epochs: 1000
+    early_stop: 200
+    batch_size: 0
+    finetune_lr: 0.0001
+  pubmed:
+    finetune_epochs: 1000
+    early_stop: 200
+    batch_size: 0
+    finetune_lr: 0.0001
+  arxiv:
+    finetune_epochs: 3000
+    early_stop: 400
+    batch_size: 0
+    finetune_lr: 0.0005
+  wikics:
+    finetune_epochs: 1000
+    early_stop: 200
+    batch_size: 0
+    finetune_lr: 0.0001
+  reddit:
+    finetune_epochs: 10
+    early_stop: 10
+    batch_size: 0
+    finetune_lr: 0.001
+  airport:
+    finetune_epochs: 1000
+    early_stop: 200
+    batch_size: 0
+    finetune_lr: 0.0001
+  disease:
+    finetune_epochs: 1000
+    early_stop: 200
+    batch_size: 0
+    finetune_lr: 0.0001
+
+link:
+  WN18RR:
+    finetune_epochs: 1000
+    early_stop: 200
+    batch_size: 0
+    finetune_lr: 0.001
+  FB15K237:
+    finetune_epochs: 3000
+    early_stop: 400
+    batch_size: 0
+    finetune_lr: 0.0005
+
+graph:
+  chemhiv:
+    finetune_epochs: 400
+    early_stop: 40
+    batch_size: 1024
+    finetune_lr: 0.0005
+  chempcba:
+    finetune_epochs: 30
+    early_stop: 50
+    batch_size: 512
+    finetune_lr: 0.0001
+  proteins:
+    finetune_epochs: 200
+    early_stop: 50
+    batch_size: 128
+    finetune_lr: 0.0001
+  imdb-binary:
+    finetune_epochs: 200
+    early_stop: 50
+    batch_size: 512
+    finetune_lr: 0.0001

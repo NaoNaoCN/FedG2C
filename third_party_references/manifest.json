@@ -1,0 +1,65 @@
+[
+  {
+    "repository": "nerdslab/bgrl",
+    "commit": "60f9f19ad0598f9163ad70ebbde3e7297760901e",
+    "file": "third_party_references/bgrl/bgrl/transforms.py",
+    "url": "https://raw.githubusercontent.com/nerdslab/bgrl/60f9f19ad0598f9163ad70ebbde3e7297760901e/bgrl/transforms.py",
+    "sha256": "456401ba4bab8228b56ef9b5c70715a8e9b2f412986efbe9af324a8d7c707dfb"
+  },
+  {
+    "repository": "nerdslab/bgrl",
+    "commit": "60f9f19ad0598f9163ad70ebbde3e7297760901e",
+    "file": "third_party_references/bgrl/config/amazon-computers.cfg",
+    "url": "https://raw.githubusercontent.com/nerdslab/bgrl/60f9f19ad0598f9163ad70ebbde3e7297760901e/config/amazon-computers.cfg",
+    "sha256": "f85ee73304cf9809fee8cbdf7f22cb8a1ef9051aeccc1e5c7a1798718282a569"
+  },
+  {
+    "repository": "nerdslab/bgrl",
+    "commit": "60f9f19ad0598f9163ad70ebbde3e7297760901e",
+    "file": "third_party_references/bgrl/config/coauthor-cs.cfg",
+    "url": "https://raw.githubusercontent.com/nerdslab/bgrl/60f9f19ad0598f9163ad70ebbde3e7297760901e/config/coauthor-cs.cfg",
+    "sha256": "822ceaabbf4f61f9dff975b5520422a6b8cf3eac3255b9d4cc8c5c5d0575295d"
+  },
+  {
+    "repository": "nerdslab/bgrl",
+    "commit": "60f9f19ad0598f9163ad70ebbde3e7297760901e",
+    "file": "third_party_references/bgrl/LICENSE.md",
+    "url": "https://raw.githubusercontent.com/nerdslab/bgrl/60f9f19ad0598f9163ad70ebbde3e7297760901e/LICENSE.md",
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+  },
+  {
+    "repository": "rampasek/GraphGPS",
+    "commit": "28015707cbab7f8ad72bed0ee872d068ea59c94b",
+    "file": "third_party_references/GraphGPS/graphgps/transform/posenc_stats.py",
+    "url": "https://raw.githubusercontent.com/rampasek/GraphGPS/28015707cbab7f8ad72bed0ee872d068ea59c94b/graphgps/transform/posenc_stats.py",
+    "sha256": "89024de4da15b6b19bbedb5472413f8dc37cb333396f4d942ae6bd6546a45eac"
+  },
+  {
+    "repository": "rampasek/GraphGPS",
+    "commit": "28015707cbab7f8ad72bed0ee872d068ea59c94b",
+    "file": "third_party_references/GraphGPS/LICENSE",
+    "url": "https://raw.githubusercontent.com/rampasek/GraphGPS/28015707cbab7f8ad72bed0ee872d068ea59c94b/LICENSE",
+    "sha256": "f7c70077a9ba8524b0f73672ee17da050f4688f450bdde039f066a1c75e91c3b"
+  },
+  {
+    "repository": "facebookresearch/ijepa",
+    "commit": "52c1ae95d05f743e000e8f10a1f3a79b10cff048",
+    "file": "third_party_references/ijepa/src/train.py",
+    "sha256": "6b5467b6663ace871ede718168b152d6759a2ec26b94bb688ae6e46c80e835aa",
+    "url": "https://github.com/facebookresearch/ijepa/blob/52c1ae95d05f743e000e8f10a1f3a79b10cff048/src/train.py"
+  },
+  {
+    "repository": "facebookresearch/ijepa",
+    "commit": "52c1ae95d05f743e000e8f10a1f3a79b10cff048",
+    "file": "third_party_references/ijepa/src/models/vision_transformer.py",
+    "sha256": "69be453a6367460fd0c94588af6531c022a2469ff72e0a793c16fd110dd498c0",
+    "url": "https://github.com/facebookresearch/ijepa/blob/52c1ae95d05f743e000e8f10a1f3a79b10cff048/src/models/vision_transformer.py"
+  },
+  {
+    "repository": "facebookresearch/ijepa",
+    "commit": "52c1ae95d05f743e000e8f10a1f3a79b10cff048",
+    "file": "third_party_references/ijepa/LICENSE",
+    "sha256": "336255dc30193e8e15d689d9481bb05673d89055718f3a96923a7ffb99adbbaf",
+    "url": "https://github.com/facebookresearch/ijepa/blob/52c1ae95d05f743e000e8f10a1f3a79b10cff048/LICENSE"
+  }
+]

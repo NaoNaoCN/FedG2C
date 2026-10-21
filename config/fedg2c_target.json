@@ -1,0 +1,15 @@
+{
+  "adaptation": "lora",
+  "rank": 4,
+  "lora_alpha": 4.0,
+  "bottleneck": 8,
+  "local_alpha": 0.0,
+  "learnable_alpha": false,
+  "epochs": 20,
+  "batch_size": 8,
+  "lr": 0.001,
+  "weight_decay": 0.0,
+  "max_nodes": 128,
+  "node_hops": 2,
+  "seed": 2026
+}

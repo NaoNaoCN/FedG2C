@@ -11,6 +11,7 @@ from .target_model import TargetConfig, TargetModel, load_shared
 from .target_data import load_target_manifest, select_support
 from .model import SharedBackbone
 from .edge_config import EdgePredictionConfig
+from .batching import GraphBatch
 
 
 def classification_loss(logits, labels, objective):
@@ -58,6 +59,15 @@ def metrics(logits, labels, objective):
 
 
 def predict(model, samples, device):
+    if len(samples) > 1:
+        view = GraphBatch.collate([s.view for s in samples]).to(device, non_blocking=True)
+        roots = None
+        if model.task['level'] == 'node':
+            if any(s.root is None or not 0 <= s.root < s.view.num_nodes for s in samples):
+                raise ValueError('Node prediction needs the remapped root index')
+            roots = torch.tensor([s.root for s in samples], device=device)
+        labels = torch.cat([s.label.reshape(1, -1) for s in samples]).to(device, non_blocking=True)
+        return model.forward_batch(view, roots), labels
     logits, labels = [], []
     for sample in samples:
         logits.append(model(sample.view.to(device), sample.root))
@@ -69,20 +79,23 @@ def predict(model, samples, device):
 def evaluate(model, samples, device):
     model.eval()
     logits, labels = [], []
-    for sample in samples:
-        logits.append(model(sample.view.to(device), sample.root).detach().cpu())
-        labels.append(sample.label.reshape(1,-1).cpu())
+    for start in range(0, len(samples), model.config.eval_batch_size):
+        batch = [samples[i] for i in range(start, min(start + model.config.eval_batch_size, len(samples)))]
+        z, y = predict(model, batch, device)
+        logits.append(z.detach().cpu())
+        labels.append(y.cpu())
     return metrics(torch.cat(logits), torch.cat(labels), model.task['objective'])
 
 
-def run_target(checkpoint, manifest_path, config, output, device='cpu'):
+def run_target(checkpoint, manifest_path, config, output, device='cpu', data_cache=None):
     output = Path(output)
     if output.exists():
         raise FileExistsError('Use a new output directory')
     torch.manual_seed(config.seed)
     if str(device).startswith('cuda'):
         torch.cuda.manual_seed_all(config.seed)
-    manifest, splits = load_target_manifest(manifest_path, config, include_test=config.evaluate_test)
+    manifest, splits = load_target_manifest(manifest_path, config, include_test=config.evaluate_test,
+                                           data_cache=data_cache)
     train_count = len(splits['train'])
     splits['train'], support = select_support(splits['train'], manifest['task'], config.k_shot)
     if config.selection_metric == 'accuracy' and manifest['task']['objective'] != 'multiclass':
@@ -104,7 +117,7 @@ def run_target(checkpoint, manifest_path, config, output, device='cpu'):
         started = time.monotonic()
         model.train()
         order = torch.randperm(len(splits['train']), generator=generator).tolist() # 打乱训练集样本顺序
-        loss_sum, observed = 0.0, 0
+        loss_sum, observed = torch.zeros((), device=device), 0
         logical_batch = config.batch_size or len(order)
         for start in range(0,len(order),logical_batch):
             indices = order[start:start+logical_batch]
@@ -122,7 +135,7 @@ def run_target(checkpoint, manifest_path, config, output, device='cpu'):
                 if not torch.isfinite(loss):
                     raise FloatingPointError('Nonfinite training loss')
                 (loss * count).backward()
-                loss_sum += float(loss.detach())*count
+                loss_sum += loss.detach()*count
                 observed += count
                 batch_count += count
             if not batch_count:
@@ -138,10 +151,11 @@ def run_target(checkpoint, manifest_path, config, output, device='cpu'):
         scheduled = epoch % config.eval_interval == 0 or epoch == config.epochs-1
         valid = evaluate(model,splits['valid'],device) if scheduled else None
         if scheduled:
-            history.append({'epoch':epoch+1,'train_loss':loss_sum/observed,'valid':valid})
+            train_loss = float(loss_sum.cpu()) / observed
+            history.append({'epoch':epoch+1,'train_loss':train_loss,'valid':valid})
             (output/'history.json').write_text(json.dumps(history,indent=2,allow_nan=False)+'\n')
             print(json.dumps({'stage':'target_epoch','adaptation':config.adaptation,'epoch':epoch+1,
-                              'train_loss':loss_sum/observed,'valid':valid,
+                              'train_loss':train_loss,'valid':valid,
                               'elapsed_seconds':round(time.monotonic()-started,2)}),flush=True)
         if not scheduled:
             continue
@@ -176,7 +190,8 @@ def run_target(checkpoint, manifest_path, config, output, device='cpu'):
               'support_sha256':hashlib.sha256(json.dumps([str(splits['train'].refs[i])
                                   for i in range(len(splits['train']))]).encode()).hexdigest(),
               'optimizer_steps':optimizer_steps, 'logical_batch_size':config.batch_size,
-              'microbatch_size':config.microbatch_size, 'eval_interval':config.eval_interval,
+              'microbatch_size':config.microbatch_size, 'eval_batch_size':config.eval_batch_size,
+              'crop_cache_mb':config.crop_cache_mb, 'eval_interval':config.eval_interval,
               'patience_unit':'validation events',
               'visibility':manifest['visibility'], 'protocol_id':manifest['protocol_id'],
               'smoke_only':manifest.get('smoke_only',False)}

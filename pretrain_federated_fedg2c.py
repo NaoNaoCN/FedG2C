@@ -34,6 +34,8 @@ def main(argv=None):
     parser.add_argument('--views-per-graph',type=int,default=1)
     parser.add_argument('--batch-size',type=int,default=1,
                         help='Independent source views per optimizer update')
+    parser.add_argument('--physical-batch-size',type=int,default=1,
+                        help='Views computed together; leaves optimizer/EMA update boundaries unchanged')
     parser.add_argument('--sampling-unit',choices=['graph','node'],default='graph')
     parser.add_argument('--local-steps',type=int)
     parser.add_argument('--source-order',choices=['sequential','shuffled_cycle','shuffled_epoch'],default='sequential')
@@ -43,7 +45,7 @@ def main(argv=None):
     parser.add_argument('--threads',type=int,default=1)
     parser.add_argument('--output',type=Path,required=True)
     args=parser.parse_args(argv)
-    if min(args.rounds,args.local_epochs,args.views_per_graph,args.threads,args.batch_size)<1 or (args.local_steps is not None and args.local_steps<1):
+    if min(args.rounds,args.local_epochs,args.views_per_graph,args.threads,args.batch_size,args.physical_batch_size)<1 or (args.local_steps is not None and args.local_steps<1):
         parser.error('Positive counts required')
     if args.log_every < 0:
         parser.error('--log-every must be nonnegative')
@@ -118,7 +120,7 @@ def main(argv=None):
             local=client.pretrain(graphs_factory,args.local_epochs,
                                  args.views_per_graph,args.seed+round_id*10007+index,args.local_steps,
                                  log_every=args.log_every, batch_size=args.batch_size,
-                                 sampling_unit=args.sampling_unit)
+                                 sampling_unit=args.sampling_unit, physical_batch_size=args.physical_batch_size)
             if selected is not None:
                 local['sampling'] = {'mode':args.source_order,'pool_size':len(pool.graphs),
                                      'seed':pool.seed,'stream_start':round_id*graph_budget,
@@ -136,7 +138,7 @@ def main(argv=None):
                       'device':str(args.device),'source_order':args.source_order,
                       'local_epochs':args.local_epochs,'views_per_graph':args.views_per_graph,
                       'local_steps':args.local_steps,'batch_size':args.batch_size,
-                      'sampling_unit':args.sampling_unit}
+                      'sampling_unit':args.sampling_unit,'physical_batch_size':args.physical_batch_size}
             torch.save({'metadata':metadata,'client_id':record['id'],'state_dict':state},client_folder/'shared_backbone.pt')
             (client_folder/'metrics.json').write_text(json.dumps(local,indent=2,allow_nan=False)+'\n')
         # ===== FedG2C ADD BEGIN B：替代原上传列表；服务器内部仍用相同参数聚合 =====

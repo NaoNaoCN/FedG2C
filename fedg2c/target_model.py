@@ -32,18 +32,22 @@ class TargetConfig:
     evaluate_test: bool = True
     grad_clip: float = 5.0
     microbatch_size: int = 1
+    eval_batch_size: int = 1
+    crop_cache_mb: int = 128
     eval_interval: int = 1
     k_shot: int = -1
 
     def __post_init__(self):
         if self.adaptation not in ('none', 'lora', 'adapter', 'prompt'):
             raise ValueError('Unknown adaptation')
-        for k in ('rank', 'bottleneck', 'epochs', 'node_hops', 'microbatch_size', 'eval_interval'):
+        for k in ('rank', 'bottleneck', 'epochs', 'node_hops', 'microbatch_size', 'eval_batch_size', 'eval_interval'):
             if type(getattr(self, k)) is not int or getattr(self, k) < 1:
                 raise ValueError(f'{k} must be a positive integer')
         for k in ('batch_size', 'max_nodes'):
             if type(getattr(self, k)) is not int or getattr(self, k) < 0:
                 raise ValueError(f'{k} must be a nonnegative integer (0 means full)')
+        if type(self.crop_cache_mb) is not int or self.crop_cache_mb < 0:
+            raise ValueError('crop_cache_mb must be a nonnegative integer (0 disables caching)')
         if type(self.k_shot) is not int or (self.k_shot != -1 and self.k_shot < 1):
             raise ValueError('k_shot must be -1 or positive')
         if not 0 <= self.local_alpha <= 1 or (self.learnable_alpha and not 0 < self.local_alpha < 1):
@@ -182,6 +186,32 @@ class TargetModel(nn.Module):
 
     def frozen_base_unchanged(self):
         return state_digest({k:self.shared.state_dict()[k] for k in self.base_keys}) == self.base_sha256
+
+    def forward_batch(self, view, roots=None):
+        x = self.node_adapter(view.x)
+        if (self.edge_adapter is None) != (view.edge_attr is None):
+            raise ValueError('Edge attributes must match the explicit target schema')
+        edge = self.edge_adapter(view.edge_attr) if self.edge_adapter is not None else None
+        pure_local = self.config.local_alpha == 1 and self.alpha_logit is None
+        if not pure_local:
+            h = self.shared.encode_experts(x, view.edge_index, edge)
+            if self.prompt is not None:
+                h = h + self.prompt
+            z = self.shared.compose_batch(h, view)
+            if self.adapter is not None:
+                z = self.adapter(z)
+        if self.local_encoder is not None:
+            local = self.local_encoder(x, view.edge_index, edge)
+            z = local if pure_local else self.alpha() * local + (1-self.alpha()) * z
+        if self.task['level'] == 'graph':
+            pooled = z.new_zeros(view.num_graphs, z.shape[-1]).index_add(0, view.node_batch, z)
+            counts = view.valid_nodes.sum(dim=1, keepdim=True)
+            z = pooled / counts
+        else:
+            if roots is None or roots.shape != (view.num_graphs,):
+                raise ValueError('Node batch needs one remapped root per view')
+            z = z[view.offsets + roots]
+        return self.head(z)
 
     def parameter_report(self):
         groups = {}

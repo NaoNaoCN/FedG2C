@@ -85,14 +85,16 @@ def resolve_config(path):
                 raise ValueError('Prepared manifest paths must match data.prepare.output')
     keys(s1, ('training','module_a','module_b'), ('training','module_a','module_b'), 'stage1')
     training = s1['training']
-    keys(training, ('rounds','local_budget','views_per_graph','log_every','batch_size','sampling_unit'),
+    keys(training, ('rounds','local_budget','views_per_graph','log_every','batch_size','physical_batch_size','sampling_unit'),
          ('rounds','local_budget','views_per_graph','log_every'), 'stage1.training')
     for name in ('rounds','views_per_graph'):
         positive(training[name], name)
     positive(training['log_every'], 'log_every', 0)
     training.setdefault('batch_size', 1)
+    training.setdefault('physical_batch_size', 1)
     training.setdefault('sampling_unit', 'graph')
     positive(training['batch_size'], 'batch_size')
+    positive(training['physical_batch_size'], 'physical_batch_size')
     if training['sampling_unit'] not in ('graph', 'node'):
         raise ValueError('sampling_unit must be graph or node')
     budget = training['local_budget']
@@ -101,6 +103,8 @@ def resolve_config(path):
         raise ValueError('local_budget.unit must be steps or epochs')
     positive(budget['amount'], 'local_budget.amount')
     s1['module_a'] = EdgePredictionConfig(**s1['module_a']).to_dict()
+    if min(training['physical_batch_size'], training['batch_size']) > 1 and s1['module_a']['dropout']:
+        raise ValueError('Use physical_batch_size=1 with dropout to preserve the scalar RNG stream')
     s1['module_b'] = ResponseAggregationConfig(**s1['module_b']).to_dict()
     keys(s2, ('checkpoint','adaptations','target','k_shots','seeds'), ('adaptations','target'), 'stage2')
     modes = s2['adaptations']
@@ -141,6 +145,7 @@ def plan(cfg, stage):
         '--seed', str(cfg['run']['seed']), '--threads', str(cfg['run']['threads']),
         '--device', cfg['run']['device'], '--log-every', str(training['log_every']),
         '--batch-size', str(training['batch_size']), '--sampling-unit', training['sampling_unit'],
+        '--physical-batch-size', str(training['physical_batch_size']),
         '--output', str(root/'stage1')]
     if budget['unit'] == 'steps':
         pretrain_args += ['--local-epochs','1','--local-steps',str(budget['amount']),
@@ -350,12 +355,14 @@ def execute(cfg, stage='all', config_path=None):
                 reports = {}
                 if execution['target_outputs']:
                     from .target_train import run_target
+                    from .target_data import TargetDataCache
+                    target_data_cache = TargetDataCache(cfg['stage2']['target']['crop_cache_mb'])
                     for run in execution['target_runs']:
                         target_raw = dict(cfg['stage2']['target'], adaptation=run['adaptation'],
                                           seed=run['seed'], k_shot=run['k_shot'])
                         target = TargetConfig(**target_raw)
                         reports[run['key']] = run_target(execution['checkpoint'], cfg['data']['target_manifest'],
-                                                        target, run['output'], cfg['run']['device'])
+                                                        target, run['output'], cfg['run']['device'], target_data_cache)
                 write_json(root/'summary.json', {mode:{k:r[k] for k in
                            ('best_epoch','epochs_ran','validation','test','test_evaluated','frozen_base_unchanged')}
                            for mode,r in reports.items()})

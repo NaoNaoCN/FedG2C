@@ -12,17 +12,17 @@ from torch import nn
 
 
 def head_rms(scores, mask, epsilon=1e-6):
-    """[heads,query,key]; masks must be ZERO, never -inf before RMS."""
-    scores = scores.masked_fill(~mask.unsqueeze(0), 0)
-    return scores * torch.rsqrt(scores.square().mean(dim=0, keepdim=True) + epsilon)
+    """[...,heads,query,key]; ZERO masking and RMS along heads only."""
+    scores = scores.masked_fill(~mask.unsqueeze(-3), 0)
+    return scores * torch.rsqrt(scores.square().mean(dim=-3, keepdim=True) + epsilon)
 
 
 def hypernetwork_contract(code, value, nonlinear=True):
     # Port of attention.py:409-417. Keep the head-axis contraction and code reuse.
-    intermediate = torch.einsum("hqk,khd->qkd", code, value)
+    intermediate = torch.einsum("...hqk,...khd->...qkd", code, value)
     if nonlinear:
         intermediate = intermediate.relu()
-    return torch.einsum("hqk,qkd->qhd", code, intermediate)
+    return torch.einsum("...hqk,...qkd->...qhd", code, intermediate)
 
 
 class RelationComposer(nn.Module):
@@ -64,7 +64,7 @@ class RelationComposer(nn.Module):
                 if relation_gate.shape != (p, p):
                     raise ValueError("relation_gate must be [P,P]")
                 bias = bias * relation_gate.unsqueeze(0)
-            
+
             # TODO: 观察scores和bias的数值，决定此处使用加法是否稳妥
             scores = scores + bias.repeat_interleave(m, 1).repeat_interleave(m, 2)
         # All tokens belong to this bounded patch; no hidden node is present.
@@ -78,4 +78,43 @@ class RelationComposer(nn.Module):
         out = self.norm(tokens + self.output(out.reshape(p * m, d)))
         z = out.reshape(p, m, d).mean(dim=1) # [p, d]
         return (z, code) if return_routing else z
+
+    # ===== FedG2C ADD BEGIN A/C: batch axis keeps attention local to each view =====
+    def forward_batch(self, expert_repr, relations, valid_nodes, relation_gate=None,
+                      return_routing=False):
+        b, p, m, d = expert_repr.shape
+        if (m != self.experts or d != self.dim or relations.shape != (b, p, p, 3)
+                or valid_nodes.shape != (b, p) or valid_nodes.dtype != torch.bool):
+            raise ValueError('Composer batch expects [B,P,M,d], [B,P,P,3], boolean [B,P]')
+        if self.mode == 'linear_gate':
+            weights = self.gate(expert_repr).squeeze(-1).softmax(dim=-1)
+            z = self.norm((weights.unsqueeze(-1) * expert_repr).sum(dim=2))
+            z = z * valid_nodes.unsqueeze(-1)
+            return (z, weights) if return_routing else z
+        tokens = expert_repr.reshape(b, p * m, d)
+        q = self.query(tokens).reshape(b, p * m, self.heads, self.depth)
+        k = self.key(tokens).reshape(b, p * m, self.heads, self.depth)
+        v = self.value(tokens).reshape(b, p * m, self.heads, self.depth)
+        scores = torch.einsum('bqhd,bkhd->bhqk', q / math.sqrt(self.depth), k)
+        if self.relation is not None:
+            bias = self.relation(relations).permute(0, 3, 1, 2)
+            if relation_gate is not None:
+                if relation_gate.shape != (b, p, p):
+                    raise ValueError('Batched relation_gate must be [B,P,P]')
+                bias = bias * relation_gate.unsqueeze(1)
+            scores = scores + bias.repeat_interleave(m, 2).repeat_interleave(m, 3)
+        valid = valid_nodes.repeat_interleave(m, dim=1)
+        mask = valid.unsqueeze(2) & valid.unsqueeze(1)
+        if self.mode == 'standard_attention':
+            # Mask keys first: padded queries must not softmax an all -inf row.
+            code = scores.masked_fill(~valid[:, None, None, :], -torch.inf).softmax(dim=-1)
+            code = code * valid[:, None, :, None]
+            out = torch.einsum('bhqk,bkhd->bqhd', code, v)
+        else:
+            code = head_rms(scores, mask)
+            out = hypernetwork_contract(code, v, nonlinear=self.mode == 'hypernetwork_relu')
+        out = self.norm(tokens + self.output(out.reshape(b, p * m, d)))
+        z = out.reshape(b, p, m, d).mean(dim=2) * valid_nodes.unsqueeze(-1)
+        return (z, code) if return_routing else z
+    # ===== FedG2C ADD END A/C =====
 # ===== FedG2C ADD END A =====

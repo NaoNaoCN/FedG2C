@@ -40,4 +40,23 @@ class NodeRepresentationPredictor(nn.Module):
         for block in self.blocks:
             sequence = block(sequence)
         return self.output(self.norm(sequence[0, len(context):]))
+
+    def forward_batch(self, main_repr, visible_position, pair):
+        view = pair.visible_view
+        context = self.embedding(main_repr)
+        position = self.position(visible_position) if self.position is not None else torch.zeros_like(context)
+        context = view.pad(context + position)
+        queries = self.mask_token + position[pair.prediction_indices]
+        # Physical batches are collated on CPU; max query count is bounded by P.
+        width = view.max_nodes
+        slots = pair.query_batch * width + pair.query_local
+        padded = queries.new_zeros(view.num_graphs * width, queries.shape[-1]).index_copy(0, slots, queries)
+        padded = padded.reshape(view.num_graphs, width, -1)
+        query_mask = torch.arange(width, device=queries.device)[None, :] < pair.query_counts[:, None]
+        sequence = torch.cat((context, padded), dim=1)
+        valid = torch.cat((view.valid_nodes, query_mask), dim=1)
+        for block in self.blocks:
+            sequence = block(sequence, src_key_padding_mask=~valid)
+        output = self.output(self.norm(sequence[:, width:]))
+        return output.flatten(0, 1).index_select(0, slots)
 # ===== FedG2C ADD END A =====

@@ -34,7 +34,7 @@ class GraphNeighborhoodIndex:
         incoming = self.in_order[self.in_ptr[root]:self.in_ptr[root+1]]
         return set(self.col[outgoing].tolist()) | set(self.row[incoming].tolist())
 
-    def induce(self, nodes):
+    def induced_edges(self, nodes):
         ids = nodes.tolist()
         mapping = {node: i for i, node in enumerate(ids)}
         selected = []
@@ -47,6 +47,10 @@ class GraphNeighborhoodIndex:
         # neighborhood() returns sorted IDs, so searchsorted remaps only the
         # selected arcs without a fresh O(full_graph_nodes) allocation per root.
         edge_index = torch.searchsorted(nodes, original)
+        return edge_index, selected
+
+    def induce(self, nodes, topology=None):
+        edge_index, selected = self.induced_edges(nodes) if topology is None else topology
         edge_attr = None if self.graph.edge_attr is None else self.graph.edge_attr[selected]
         return GraphView(self.graph.x[nodes], edge_index, edge_attr,
                          self.graph.original_node_id[nodes])

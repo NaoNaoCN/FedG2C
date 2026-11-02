@@ -105,6 +105,8 @@ python finetune_fedg2c.py --use-new-design \
 
 Gefra 原始的跨数据集留一迁移协议（分子图与节点分类）由 `config/fedg2c_gefra_loo_v1.json` 配置，协议边界与运行命令见 [Gefra 留一迁移实验说明](docs/gefra_loo_v1.md)。
 
+Cora 的 GPU 批处理版本使用 `config/fedg2c_gefra_loo_v1_cora_cuda.json` 和 `bash scripts/fedg2c/run_cora_formal_gpu.sh`，仅启动 Cora 留一迁移 pipeline。物理批次、逻辑更新边界、缓存与对照验证见 [批处理与 Cora 重跑](docs/fedg2c-batching.md)。
+
 ## 5. 依据、贡献与验证边界
 
 | 部分 | 已有依据及复用 | 本项目需检验的设计 |

@@ -54,16 +54,18 @@ class RelationComposer(nn.Module):
             z = self.norm((weights.unsqueeze(-1) * expert_repr).sum(dim=1))
             return (z, weights) if return_routing else z
         tokens = expert_repr.reshape(p * m, d)
-        q = self.query(tokens).reshape(p * m, self.heads, self.depth)
+        q = self.query(tokens).reshape(p * m, self.heads, self.depth) # [p*m, head, d_h]
         k = self.key(tokens).reshape(p * m, self.heads, self.depth)
         v = self.value(tokens).reshape(p * m, self.heads, self.depth)
-        scores = torch.einsum("qhd,khd->hqk", q / math.sqrt(self.depth), k)
+        scores = torch.einsum("qhd,khd->hqk", q / math.sqrt(self.depth), k) # [head, p*m, p*m]
         if self.relation is not None:
-            bias = self.relation(relations).permute(2, 0, 1)
+            bias = self.relation(relations).permute(2, 0, 1) #[head, p, p]
             if relation_gate is not None:
                 if relation_gate.shape != (p, p):
                     raise ValueError("relation_gate must be [P,P]")
                 bias = bias * relation_gate.unsqueeze(0)
+            
+            # TODO: 观察scores和bias的数值，决定此处使用加法是否稳妥
             scores = scores + bias.repeat_interleave(m, 1).repeat_interleave(m, 2)
         # All tokens belong to this bounded patch; no hidden node is present.
         mask = torch.ones(p * m, p * m, dtype=torch.bool, device=tokens.device)
@@ -74,6 +76,6 @@ class RelationComposer(nn.Module):
             code = head_rms(scores, mask)
             out = hypernetwork_contract(code, v, nonlinear=self.mode == "hypernetwork_relu")
         out = self.norm(tokens + self.output(out.reshape(p * m, d)))
-        z = out.reshape(p, m, d).mean(dim=1)
+        z = out.reshape(p, m, d).mean(dim=1) # [p, d]
         return (z, code) if return_routing else z
 # ===== FedG2C ADD END A =====

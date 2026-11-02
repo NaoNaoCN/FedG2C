@@ -32,7 +32,7 @@
 # ===== FedG2C ADD END C =====
 ```
 
-跨模块接点按新增责任标记。例如 `edge_entry.py` 的本地训练属于 A，其上传指纹与轮次补充属于 B。原 Gefra 的运行实现通过独立入口或开关保留；本分享目录已移除验证资料、测试目录和合成运行产物。后续需要替换原行为时，应增加带标记的实现及选择分支，并在接点注释中写清对应关系。
+跨模块接点按新增责任标记。例如 `edge_entry.py` 的本地训练属于 A，其上传指纹与轮次补充属于 B。原 Gefra 的运行实现通过独立入口或开关保留；历史验证资料和合成运行产物不附带，M1 数据导出回归检查保存在 `tests/`。后续需要替换原行为时，应增加带标记的实现及选择分支，并在接点注释中写清对应关系。
 
 原样第三方代码不加标记，保留许可证、固定提交和文件哈希。`third_party_references/` 是查阅快照；模块三的 `fedg2c/vendor/loralib/` 是原样引入的官方运行依赖，属于明确例外。JSON 配置不支持注释，由文件用途和对应模块文档说明。文档中的工程路径均以 `FedG2C/` 为根，不写本机工作目录。
 
@@ -97,6 +97,14 @@ python finetune_fedg2c.py --use-new-design \
 
 真实源数据使用 `--source-manifest`；真实目标数据使用 `--target-manifest`。它们分别描述输入文件与可用划分，不是模型模块。新共享检查点必须经新加载器读取，不能交给旧几何加载器。
 
+真实分子图的 M1 CPU 工程验证使用 `scripts/fedg2c/run_molecular_cpu.sh`；数据协议、固定预算与复现方法见 [M1 分子图实验说明](docs/fedg2c-molecular-m1.md)。
+
+已确认的 A 方案使用 `scripts/fedg2c/run_molecular_formal_gpu.sh` 在 CUDA 上运行 10 轮预训练、每客户端每轮 1,000 步，以及四种适配各 20 epochs；配置和来源记录见 [分子图正式实验 A](docs/fedg2c-molecular-formal-a.md)。
+
+统一配置入口：`python run_fedg2c_pipeline.py --config config/fedg2c_molecular_pipeline.json`。同一 JSON 分别控制阶段一（A+B 联邦预训练）与阶段二（下游适配），支持 `--stage stage1/stage2` 和 `--dry-run`。预算含义、饱和分析、验证模式及新主机的 10/20 步比较见 [分子图预算审计与统一配置](docs/fedg2c-molecular-budget.md)。
+
+Gefra 原始的跨数据集留一迁移协议（分子图与节点分类）由 `config/fedg2c_gefra_loo_v1.json` 配置，协议边界与运行命令见 [Gefra 留一迁移实验说明](docs/gefra_loo_v1.md)。
+
 ## 5. 依据、贡献与验证边界
 
 | 部分 | 已有依据及复用 | 本项目需检验的设计 |
@@ -111,4 +119,4 @@ python finetune_fedg2c.py --use-new-design \
 
 ## 6. 分享目录说明
 
-目录保留运行代码、配置、四份主设计文档、历史设计与论文代码来源。验证报告、自动化测试、历史合成产物和缓存已移除。示例中的 `runs/` 是执行命令后创建的输出目录，不附带预训练权重或真实数据；先完成本地／联邦预训练，再将产生的检查点交给聚合或微调入口。
+目录保留运行代码、配置、主设计文档、历史设计、论文代码来源及 M1 数据导出回归检查。历史验证报告、合成产物和缓存不附带。示例中的 `runs/` 是执行命令后创建的输出目录，不附带预训练权重或真实数据；先完成本地／联邦预训练，再将产生的检查点交给聚合或微调入口。

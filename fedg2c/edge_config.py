@@ -1,5 +1,6 @@
 # ===== FedG2C ADD BEGIN A： nodewise latent prediction configuration (revision 2) =====
 from dataclasses import dataclass, asdict
+import math
 
 
 @dataclass(frozen=True)
@@ -34,6 +35,7 @@ class EdgePredictionConfig:
     dropout: float = 0.0
     lr: float = 0.001
     weight_decay: float = 0.00001
+    grad_clip: float = 5.0
 
     def __post_init__(self):
         # ===== FedG2C ADD BEGIN A： validate explicit predictor route =====
@@ -56,8 +58,11 @@ class EdgePredictionConfig:
             raise ValueError("Masking rates must be in [0,1); zero is an explicit ablation")
         if not 0 <= self.momentum < 1 or not 0 <= self.dropout < 1:
             raise ValueError("Invalid momentum/dropout")
-        if self.lr <= 0 or self.weight_decay < 0:
+        if (not all(math.isfinite(v) for v in (self.lr, self.weight_decay))
+                or self.lr <= 0 or self.weight_decay < 0):
             raise ValueError("Invalid optimizer parameters")
+        if not math.isfinite(self.grad_clip) or self.grad_clip <= 0:
+            raise ValueError("grad_clip must be positive and finite")
         if self.backbone not in ("mysage", "gcn", "sage", "gat", "gin"):
             raise ValueError("Unsupported backbone")
         if self.composer not in ("hypernetwork_relu", "hypernetwork_linear", "standard_attention", "linear_gate"):

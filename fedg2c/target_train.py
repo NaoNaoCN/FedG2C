@@ -3,10 +3,12 @@ from dataclasses import asdict
 from pathlib import Path
 import json
 import hashlib
+import time
+import math
 import torch
 from torch.nn import functional as F
 from .target_model import TargetConfig, TargetModel, load_shared
-from .target_data import load_target_manifest
+from .target_data import load_target_manifest, select_support
 from .model import SharedBackbone
 from .edge_config import EdgePredictionConfig
 
@@ -66,8 +68,11 @@ def predict(model, samples, device):
 @torch.no_grad()
 def evaluate(model, samples, device):
     model.eval()
-    logits, labels = predict(model, samples, device)
-    return metrics(logits.cpu(), labels.cpu(), model.task['objective'])
+    logits, labels = [], []
+    for sample in samples:
+        logits.append(model(sample.view.to(device), sample.root).detach().cpu())
+        labels.append(sample.label.reshape(1,-1).cpu())
+    return metrics(torch.cat(logits), torch.cat(labels), model.task['objective'])
 
 
 def run_target(checkpoint, manifest_path, config, output, device='cpu'):
@@ -77,46 +82,102 @@ def run_target(checkpoint, manifest_path, config, output, device='cpu'):
     torch.manual_seed(config.seed)
     if str(device).startswith('cuda'):
         torch.cuda.manual_seed_all(config.seed)
-    manifest, splits = load_target_manifest(manifest_path, config)
+    manifest, splits = load_target_manifest(manifest_path, config, include_test=config.evaluate_test)
+    train_count = len(splits['train'])
+    splits['train'], support = select_support(splits['train'], manifest['task'], config.k_shot)
+    if config.selection_metric == 'accuracy' and manifest['task']['objective'] != 'multiclass':
+        raise ValueError('accuracy selection requires a multiclass task')
+    if config.selection_metric in ('roc_auc', 'average_precision') and manifest['task']['objective'] == 'multiclass':
+        raise ValueError('Ranking selection requires a binary/multilabel task')
     shared, shared_config, meta = load_shared(checkpoint)
     model = TargetModel(shared, shared_config, manifest['feature_schema'], manifest['task'], config).to(device)
     optimizer = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=config.lr, weight_decay=config.weight_decay)
+    output.mkdir(parents=True)
     generator = torch.Generator().manual_seed(config.seed)
-    history, best_loss, best_state, best_epoch = [], float('inf'), None, None
+    minimize = config.selection_metric == 'loss'
+    history, best_score, best_state, best_epoch = [], (float('inf') if minimize else -float('inf')), None, None
+    stale_epochs, best_valid, optimizer_steps = 0, None, 0
+    parameters = [p for p in model.parameters() if p.requires_grad]
+    epochs_ran = 0
     for epoch in range(config.epochs):
+        epochs_ran = epoch + 1
+        started = time.monotonic()
         model.train()
         order = torch.randperm(len(splits['train']), generator=generator).tolist() # 打乱训练集样本顺序
         loss_sum, observed = 0.0, 0
-        for start in range(0,len(order),config.batch_size):
-            samples = [splits['train'][i] for i in order[start:start+config.batch_size]]
-            logits, labels = predict(model, samples, device)
-            loss, count = classification_loss(logits,labels,manifest['task']['objective'])
-            if count == 0:
-                continue
-            if not torch.isfinite(loss):
-                raise FloatingPointError('Nonfinite training loss')
+        logical_batch = config.batch_size or len(order)
+        for start in range(0,len(order),logical_batch):
+            indices = order[start:start+logical_batch]
             optimizer.zero_grad(set_to_none=True)
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_([p for p in model.parameters() if p.requires_grad], 5)
+            batch_count = 0
+            # Accumulate unnormalized loss sums, then divide once by the actual
+            # number of observed labels. This is exactly BCE's logical-batch
+            # reduction even with PCBA NaNs or a final incomplete microbatch.
+            for offset in range(0,len(indices),config.microbatch_size):
+                samples = [splits['train'][i] for i in indices[offset:offset+config.microbatch_size]]
+                logits, labels = predict(model, samples, device)
+                loss, count = classification_loss(logits,labels,manifest['task']['objective'])
+                if not count:
+                    continue
+                if not torch.isfinite(loss):
+                    raise FloatingPointError('Nonfinite training loss')
+                (loss * count).backward()
+                loss_sum += float(loss.detach())*count
+                observed += count
+                batch_count += count
+            if not batch_count:
+                continue
+            for parameter in parameters:
+                if parameter.grad is not None:
+                    parameter.grad.div_(batch_count)
+            torch.nn.utils.clip_grad_norm_(parameters, config.grad_clip, error_if_nonfinite=True)
             optimizer.step()
-            loss_sum += float(loss.detach())*count
-            observed += count
-        valid = evaluate(model,splits['valid'],device)
-        history.append({'epoch':epoch+1,'train_loss':loss_sum/observed,'valid':valid})
-        if valid['loss'] < best_loss:
-            best_loss, best_epoch = valid['loss'], epoch+1
+            optimizer_steps += 1
+        if not observed:
+            raise ValueError('Training epoch has no observed labels')
+        scheduled = epoch % config.eval_interval == 0 or epoch == config.epochs-1
+        valid = evaluate(model,splits['valid'],device) if scheduled else None
+        if scheduled:
+            history.append({'epoch':epoch+1,'train_loss':loss_sum/observed,'valid':valid})
+            (output/'history.json').write_text(json.dumps(history,indent=2,allow_nan=False)+'\n')
+            print(json.dumps({'stage':'target_epoch','adaptation':config.adaptation,'epoch':epoch+1,
+                              'train_loss':loss_sum/observed,'valid':valid,
+                              'elapsed_seconds':round(time.monotonic()-started,2)}),flush=True)
+        if not scheduled:
+            continue
+        score = valid.get(config.selection_metric)
+        if score is None or not math.isfinite(score):
+            raise ValueError('Validation selection metric is undefined/nonfinite')
+        if (score < best_score if minimize else score > best_score):
+            best_score, best_epoch, stale_epochs = score, epoch+1, 0
+            best_valid = valid
             best_state = {k:v.detach().cpu().clone() for k,v in model.state_dict().items()}
+        else:
+            stale_epochs += 1
+        if config.early_stopping_patience and stale_epochs >= config.early_stopping_patience:
+            break
     if best_state is None:
         raise FloatingPointError('No finite validation checkpoint')
     model.load_state_dict(best_state, strict=True)
     if not model.frozen_base_unchanged():
         raise RuntimeError('A pretrained base parameter changed')
     # Test is evaluated ONLY after validation has selected a checkpoint.
-    test = evaluate(model,splits['test'],device)
-    report = {'stage':'target_adaptation', 'best_epoch':best_epoch, 'selection':'minimum validation loss; first tie',
+    test = evaluate(model,splits['test'],device) if config.evaluate_test else None
+    selection = ('minimum' if minimize else 'maximum') + ' validation ' + config.selection_metric + '; first tie'
+    report = {'stage':'target_adaptation', 'best_epoch':best_epoch, 'selection':selection,
+              'validation':best_valid, 'epochs_ran':epochs_ran,
+              'validation_events':len(history), 'stopped_early':epochs_ran<config.epochs,
+              'test_evaluated':config.evaluate_test,
               'history':history, 'test':test, 'frozen_base_unchanged':True,
               'local_alpha':float(torch.as_tensor(model.alpha()).detach().cpu()), 'parameters':model.parameter_report(),
               'split_sizes':{k:len(v) for k,v in splits.items()},
+              'original_train_size':train_count, 'k_shot':config.k_shot,
+              'support_indices_in_train':support,
+              'support_sha256':hashlib.sha256(json.dumps([str(splits['train'].refs[i])
+                                  for i in range(len(splits['train']))]).encode()).hexdigest(),
+              'optimizer_steps':optimizer_steps, 'logical_batch_size':config.batch_size,
+              'microbatch_size':config.microbatch_size, 'eval_interval':config.eval_interval,
+              'patience_unit':'validation events',
               'visibility':manifest['visibility'], 'protocol_id':manifest['protocol_id'],
               'smoke_only':manifest.get('smoke_only',False)}
     metadata = {'schema_version':1, 'stage':'target_adaptation', 'config':asdict(config),
@@ -126,7 +187,6 @@ def run_target(checkpoint, manifest_path, config, output, device='cpu'):
                 'target_protocol_id':manifest['protocol_id'], 'visibility':manifest['visibility'],
                 'manifest_sha256':hashlib.sha256(Path(manifest_path).read_bytes()).hexdigest(),
                 'reference_code_manifest':'third_party_references/module_c/manifest.json'}
-    output.mkdir(parents=True)
     torch.save({'metadata':metadata,'state_dict':best_state},output/'target_model.pt')
     (output/'metrics.json').write_text(json.dumps(report,indent=2,allow_nan=False)+'\n')
     (output/'run_metadata.json').write_text(json.dumps(metadata,indent=2,allow_nan=False)+'\n')

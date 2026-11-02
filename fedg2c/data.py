@@ -22,14 +22,11 @@ def read_manifest(path):
 
 
 def iter_graphs(paths):
+    from .tensor_shards import record_count, record_at, graph_view
     for path in paths:
         payload = torch.load(path, map_location="cpu", weights_only=True)
-        graphs = payload if isinstance(payload, list) else [payload]
-        for graph in graphs:
-            x, edge_index = graph["x"], graph["edge_index"]
-            view = GraphView(x, edge_index, graph.get("edge_attr"),
-                             graph.get("original_node_id", torch.arange(x.shape[0])))
-            validate_graph(view)
+        for i in range(record_count(payload)):
+            view = graph_view(record_at(payload, i))
             # Deliberately do not pass y, PE, split masks, factor labels or caches.
             yield view
 

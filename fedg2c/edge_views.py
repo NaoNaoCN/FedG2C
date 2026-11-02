@@ -61,6 +61,12 @@ class NeighborhoodEdgeSampler(ContextSampler):
     Undirected adjacency is used ONLY to choose a region. Message passing and
     random walks retain the actual edge orientation. Feature values remain raw.
     """
+    def __init__(self, graph):
+        from .graph_index import GraphNeighborhoodIndex
+        self.index = GraphNeighborhoodIndex(graph)
+        self.graph, self.neighbors = graph, self.index.neighbors
+        self.eligible_roots = self.index.eligible_roots
+
     @staticmethod
     def neighborhood(neighbors, root, hops, cap, generator=None):
         chosen, frontier = {root}, [root]
@@ -77,13 +83,16 @@ class NeighborhoodEdgeSampler(ContextSampler):
                 break
         return torch.tensor(sorted(chosen), dtype=torch.long)
 
-    def sample_edge_view(self, config, feature_channels, generator):
-        roots = [i for i, neighbors in enumerate(self.neighbors) if neighbors - {i}]
-        if not roots:
+    def sample_edge_view(self, config, feature_channels, generator, root=None):
+        roots = self.eligible_roots
+        if len(roots) == 0:
             raise ValueError("No non-self edge in source graph; cannot construct an edge-masking view")
-        root = roots[int(torch.randint(len(roots), (1,), generator=generator))]
+        if root is None:
+            root = int(roots[int(torch.randint(len(roots), (1,), generator=generator))])
+        elif not 0 <= root < self.graph.num_nodes or not self.neighbors[root] - {root}:
+            raise ValueError('Requested root has no non-self incident edge')
         nodes = self.neighborhood(self.neighbors, root, config.context_hops, config.max_nodes, generator)
-        reference = induced_view(self.graph, nodes)
+        reference = self.index.induce(nodes)
         root_index = int((nodes == root).nonzero().item())
         edges, attrs, keep = mask_edges(reference.edge_index, reference.edge_attr,
                                        config.edge_mask_rate, len(nodes), config.undirected, generator)

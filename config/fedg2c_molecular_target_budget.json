@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "run": {
+    "output": "runs/molecular_target_budget_20261024",
+    "seed": 2026,
+    "device": "cuda",
+    "threads": 1
+  },
+  "data": {
+    "source_manifest": "runs/molecular_m1_data_20261022/data/source_manifest.json",
+    "target_manifest": "runs/molecular_m1_data_20261022/data/target_manifest.json",
+    "prepare": {
+      "kind": "molecular_m1",
+      "cache_root": "cache_data",
+      "output": "runs/molecular_m1_data_20261022/data",
+      "seed": 2026
+    }
+  },
+  "stage1": {
+    "training": {
+      "rounds": 10,
+      "local_budget": {
+        "unit": "steps",
+        "amount": 1000
+      },
+      "views_per_graph": 1,
+      "log_every": 100
+    },
+    "module_a": {
+      "edge_mask_rate": 0.5,
+      "feature_mask_rate": 0.2,
+      "hidden_dim": 64,
+      "num_experts": 4,
+      "num_heads": 4,
+      "num_layers": 2,
+      "backbone": "mysage",
+      "composer": "hypernetwork_relu",
+      "relation_condition": true,
+      "max_nodes": 32,
+      "context_hops": 2,
+      "prediction_hops": 1,
+      "undirected": true,
+      "position_encoding": "random_walk",
+      "walk_steps": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "predictor_type": "graphsage",
+      "predictor_dim": 64,
+      "predictor_heads": 4,
+      "predictor_depth": 2,
+      "momentum": 0.99,
+      "dropout": 0.0,
+      "lr": 0.001,
+      "weight_decay": 1e-05,
+      "grad_clip": 5.0
+    },
+    "module_b": {
+      "block_sizes": [
+        8,
+        8
+      ],
+      "edge_probs": [
+        [
+          0.5,
+          0.1
+        ],
+        [
+          0.1,
+          0.5
+        ]
+      ],
+      "calibration_graphs": 4,
+      "diagnostic_graphs": 2,
+      "readout_pairs": 16,
+      "directions": 2,
+      "epsilon": 0.01,
+      "steps": 10,
+      "lr": 0.05,
+      "output_weight": 1.0,
+      "response_weight": 1.0,
+      "prior_weight": 0.001,
+      "seed": 2026,
+      "mode": "response",
+      "feature_std": 1.0,
+      "directed": false
+    }
+  },
+  "stage2": {
+    "checkpoint": "runs/molecular_formal_gpu_20261023/federated/round_009/server/shared_backbone.pt",
+    "adaptations": [
+      "none",
+      "lora",
+      "adapter",
+      "prompt"
+    ],
+    "target": {
+      "rank": 4,
+      "lora_alpha": 4.0,
+      "bottleneck": 8,
+      "local_alpha": 0.0,
+      "learnable_alpha": false,
+      "epochs": 50,
+      "batch_size": 8,
+      "lr": 0.001,
+      "weight_decay": 0.0,
+      "max_nodes": 256,
+      "node_hops": 2,
+      "selection_metric": "loss",
+      "early_stopping_patience": 10,
+      "evaluate_test": false,
+      "grad_clip": 5.0
+    }
+  }
+}

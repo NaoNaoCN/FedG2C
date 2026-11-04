@@ -86,6 +86,14 @@ class GraphBatch:
         two_hop = (adjacency @ adjacency > 0).to(dtype)
         return torch.stack((identity, adjacency, two_hop), dim=-1)
 
+    def root_relations(self, roots, dtype):
+        """One query row per view; two-hop paths still use the entire view."""
+        rows = torch.arange(self.num_graphs, device=self.x.device)
+        direct = self.adjacency[rows, roots]
+        identity = roots[:, None] == torch.arange(self.max_nodes, device=roots.device)
+        two_hop = (direct.unsqueeze(1) @ self.adjacency).squeeze(1) > 0
+        return torch.stack((identity, direct.bool(), two_hop), dim=-1).to(dtype)
+
     def walk_encoding(self, steps, dtype):
         adjacency = self.adjacency.to(dtype)
         transition = adjacency / adjacency.sum(-1, keepdim=True).clamp_min(1)

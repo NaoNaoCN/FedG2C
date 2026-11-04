@@ -256,8 +256,9 @@ def test_topology_cache_is_shared_bounded_and_keeps_support_and_labels(tmp_path)
     assert support.data_cache is cache
     assert all(torch.equal(support[i].label, again['train'].label(j)) for i, j in enumerate(ids))
     assert cache.crop_bytes <= cache.max_bytes
-    # The cache stores only topology tensors plus an integer root, not features/labels.
-    assert all(len(entry[0]) == 4 for entry in cache.crops.values())
+    # Only topology and the root's binary relation row, never features/labels.
+    assert all(len(entry[0]) == 5 and entry[0][4].dtype == torch.bool
+               for entry in cache.crops.values())
     cache.max_bytes = next(iter(cache.crops.values()))[1]
     again['train'][2]
     assert cache.crop_bytes <= cache.max_bytes and len(cache.crops) <= 1

@@ -7,7 +7,7 @@ from pathlib import Path
 import json
 import torch
 
-from .context import GraphView
+from .context import GraphView, structural_relation_rows
 from .edge_views import NeighborhoodEdgeSampler
 from .graph_index import GraphNeighborhoodIndex
 from .tensor_shards import TensorShardCache, graph_view, record_at
@@ -19,12 +19,14 @@ class TargetSample:
     label: torch.Tensor
     root: int | None
     sample_id: str
+    root_relations: torch.Tensor | None = None
 
 
 class TargetDataCache:
     """Shared across seeds/adaptations; cache topology only, never embeddings.
 
-    Crops keep node IDs, remapped edges, original arc rows and the local root.
+    Crops keep node IDs, remapped edges, original arc rows, the local root and
+    its three binary structural-relation channels. No feature/embedding cache.
     Their LRU byte budget excludes the existing shard and adjacency-index cache.
     Labels and support choices are always read through the requested split.
     """
@@ -33,6 +35,16 @@ class TargetDataCache:
         self.max_bytes = crop_cache_mb * 1024 * 1024
         self.crops, self.crop_bytes = OrderedDict(), 0
         self.hits, self.misses = 0, 0
+        self.evictions = 0
+
+    @staticmethod
+    def crop_size(crop):
+        return sum(t.numel() * t.element_size() for t in crop if isinstance(t, torch.Tensor))
+
+    def stats(self):
+        return {'entries':len(self.crops), 'tensor_bytes':self.crop_bytes,
+                'budget_bytes':self.max_bytes, 'hits':self.hits, 'misses':self.misses,
+                'evictions':self.evictions}
 
     def get_crop(self, key, index, root, hops, cap):
         if key in self.crops:
@@ -42,12 +54,16 @@ class TargetDataCache:
         self.misses += 1
         nodes = NeighborhoodEdgeSampler.neighborhood(index.neighbors, root, hops, cap)
         edges, arcs = index.induced_edges(nodes)
-        crop = (nodes, edges, arcs, int((nodes == root).nonzero().item()))
-        size = sum(t.numel() * t.element_size() for t in crop[:3])
+        local_root = int((nodes == root).nonzero().item())
+        relations = structural_relation_rows(edges, len(nodes), torch.tensor([local_root]),
+                                             dtype=torch.bool)[0]
+        crop = (nodes, edges, arcs, local_root, relations)
+        size = self.crop_size(crop)
         if size <= self.max_bytes:
             while self.crop_bytes + size > self.max_bytes:
                 _, (_, old_size) = self.crops.popitem(last=False)
                 self.crop_bytes -= old_size
+                self.evictions += 1
             self.crops[key] = (crop, size)
             self.crop_bytes += size
         return crop
@@ -89,6 +105,25 @@ class TargetSamples(Sequence):
         label = record['y'] if root is None else record['y'][root]
         return checked_label(label, self.task)
 
+    def _node_crop(self, path, offset, root, record):
+        key = (path, offset)
+        if key not in self.node_indices:
+            self.node_indices[key] = GraphNeighborhoodIndex(graph_view(record))
+        graph_index = self.node_indices[key]
+        if root < 0 or root >= graph_index.graph.num_nodes:
+            raise ValueError('Invalid node root')
+        crop_key = (path, offset, root, self.config.node_hops, self.config.max_nodes)
+        crop = self.data_cache.get_crop(crop_key, graph_index, root,
+                                        self.config.node_hops, self.config.max_nodes)
+        return graph_index, crop
+
+    def topology(self, index):
+        """Prepare fixed topology without materializing features or reading labels."""
+        path, offset, root, record = self._record(index)
+        if root is None:
+            raise ValueError('Only node targets have a rooted topology cache')
+        return self._node_crop(path, offset, root, record)[1]
+
     def __getitem__(self, index):
         if isinstance(index, slice):
             return [self[i] for i in range(*index.indices(len(self)))]
@@ -99,20 +134,35 @@ class TargetSamples(Sequence):
         if root is None:
             if self.config.max_nodes and view.num_nodes > self.config.max_nodes:
                 raise ValueError('Graph exceeds max_nodes; do not silently crop labels')
-            cropped, local_root = view, None
+            cropped, local_root, relations = view, None, None
         else:
-            if key not in self.node_indices:
-                self.node_indices[key] = GraphNeighborhoodIndex(view)
-            graph_index = self.node_indices[key]
-            if root < 0 or root >= view.num_nodes:
-                raise ValueError('Invalid node root')
-            crop_key = (path, offset, root, self.config.node_hops, self.config.max_nodes)
-            nodes, edges, arcs, local_root = self.data_cache.get_crop(
-                crop_key, graph_index, root, self.config.node_hops, self.config.max_nodes)
+            graph_index, (nodes, edges, arcs, local_root, relations) = self._node_crop(
+                path, offset, root, record)
             cropped = graph_index.induce(nodes, topology=(edges, arcs))
         gid = str(record.get('graph_id', path))
         original = None if root is None else int(view.original_node_id[root])
-        return TargetSample(cropped, self.label(index), local_root, str((gid, original)))
+        return TargetSample(cropped, self.label(index), local_root, str((gid, original)), relations)
+
+
+def precompute_topology(splits):
+    """Warm only the selected training support and validation roots, never test.
+
+    The configured byte limit remains hard. Report the working set so callers
+    can enlarge the budget if LRU eviction would otherwise rebuild crops.
+    """
+    train = splits['train']
+    if (train.task['level'] != 'node' or not train.config.precompute_topology
+            or not train.data_cache.max_bytes):
+        return {'enabled':False}
+    required_bytes, counts = 0, {}
+    for name in ('train', 'valid'):
+        samples = splits[name]
+        counts[name] = len(samples)
+        for i in range(len(samples)):
+            required_bytes += train.data_cache.crop_size(samples.topology(i))
+    return {'enabled':True, 'split_sizes':counts, 'working_set_tensor_bytes':required_bytes,
+            'working_set_fits':required_bytes <= train.data_cache.max_bytes,
+            **train.data_cache.stats()}
 
 
 def load_target_manifest(path, config, include_test=True, data_cache=None):

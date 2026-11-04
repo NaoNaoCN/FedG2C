@@ -8,7 +8,7 @@ import math
 import torch
 from torch.nn import functional as F
 from .target_model import TargetConfig, TargetModel, load_shared
-from .target_data import load_target_manifest, select_support
+from .target_data import load_target_manifest, select_support, precompute_topology
 from .model import SharedBackbone
 from .edge_config import EdgePredictionConfig
 from .batching import GraphBatch
@@ -61,16 +61,21 @@ def metrics(logits, labels, objective):
 def predict(model, samples, device):
     if len(samples) > 1:
         view = GraphBatch.collate([s.view for s in samples]).to(device, non_blocking=True)
-        roots = None
+        roots, relations = None, None
         if model.task['level'] == 'node':
             if any(s.root is None or not 0 <= s.root < s.view.num_nodes for s in samples):
                 raise ValueError('Node prediction needs the remapped root index')
             roots = torch.tensor([s.root for s in samples], device=device)
+            if all(s.root_relations is not None for s in samples):
+                relations = torch.stack([F.pad(s.root_relations, (0, 0, 0, view.max_nodes-s.view.num_nodes))
+                                         for s in samples]).to(device, non_blocking=True)
         labels = torch.cat([s.label.reshape(1, -1) for s in samples]).to(device, non_blocking=True)
-        return model.forward_batch(view, roots), labels
+        return model.forward_batch(view, roots, relations), labels
     logits, labels = [], []
     for sample in samples:
-        logits.append(model(sample.view.to(device), sample.root))
+        relations = (None if sample.root_relations is None else
+                     sample.root_relations.to(device, non_blocking=True))
+        logits.append(model(sample.view.to(device), sample.root, relations))
         labels.append(sample.label.to(device).reshape(1,-1))
     return torch.cat(logits), torch.cat(labels)
 
@@ -102,6 +107,11 @@ def run_target(checkpoint, manifest_path, config, output, device='cpu', data_cac
         raise ValueError('accuracy selection requires a multiclass task')
     if config.selection_metric in ('roc_auc', 'average_precision') and manifest['task']['objective'] == 'multiclass':
         raise ValueError('Ranking selection requires a binary/multilabel task')
+    started = time.monotonic()
+    topology = precompute_topology(splits)
+    if topology['enabled']:
+        topology['elapsed_seconds'] = round(time.monotonic()-started, 3)
+        print(json.dumps({'stage':'target_topology', **topology}), flush=True)
     shared, shared_config, meta = load_shared(checkpoint)
     model = TargetModel(shared, shared_config, manifest['feature_schema'], manifest['task'], config).to(device)
     optimizer = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=config.lr, weight_decay=config.weight_decay)
@@ -192,6 +202,8 @@ def run_target(checkpoint, manifest_path, config, output, device='cpu', data_cac
               'optimizer_steps':optimizer_steps, 'logical_batch_size':config.batch_size,
               'microbatch_size':config.microbatch_size, 'eval_batch_size':config.eval_batch_size,
               'crop_cache_mb':config.crop_cache_mb, 'eval_interval':config.eval_interval,
+              'root_query_only':manifest['task']['level'] == 'node',
+              'topology_precompute':topology, 'topology_cache_final':splits['train'].data_cache.stats(),
               'patience_unit':'validation events',
               'visibility':manifest['visibility'], 'protocol_id':manifest['protocol_id'],
               'smoke_only':manifest.get('smoke_only',False)}

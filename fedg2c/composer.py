@@ -117,4 +117,50 @@ class RelationComposer(nn.Module):
         z = out.reshape(b, p, m, d).mean(dim=2) * valid_nodes.unsqueeze(-1)
         return (z, code) if return_routing else z
     # ===== FedG2C ADD END A/C =====
+
+    def forward_roots(self, expert_repr, roots, relations, valid_nodes=None,
+                      relation_gate=None, return_routing=False):
+        """Node targets: root queries with all view nodes/experts as keys/values.
+
+        Current attention, head RMS, hypernetwork contractions and LayerNorm
+        never mix queries. This is the selected output of forward_batch, with
+        no unused neighbour-query outputs. Graph tasks retain forward_batch.
+        relations contains the root row [B,P,3] of each view's full relation.
+        """
+        b, p, m, d = expert_repr.shape
+        if (m != self.experts or d != self.dim or roots.shape != (b,)
+                or roots.dtype != torch.long or relations.shape != (b, p, 3)):
+            raise ValueError('Root composer expects [B,P,M,d], int64 [B], [B,P,3]')
+        if valid_nodes is None:
+            valid_nodes = torch.ones(b, p, dtype=torch.bool, device=expert_repr.device)
+        if valid_nodes.shape != (b, p) or valid_nodes.dtype != torch.bool:
+            raise ValueError('Root composer needs boolean [B,P] valid_nodes')
+        root_tokens = expert_repr[torch.arange(b, device=expert_repr.device), roots]
+        if self.mode == 'linear_gate':
+            weights = self.gate(root_tokens).squeeze(-1).softmax(dim=-1)
+            z = self.norm((weights.unsqueeze(-1) * root_tokens).sum(dim=1))
+            return (z, weights) if return_routing else z
+        tokens = expert_repr.reshape(b, p * m, d)
+        q = self.query(root_tokens).reshape(b, m, self.heads, self.depth)
+        k = self.key(tokens).reshape(b, p * m, self.heads, self.depth)
+        v = self.value(tokens).reshape(b, p * m, self.heads, self.depth)
+        scores = torch.einsum('bqhd,bkhd->bhqk', q / math.sqrt(self.depth), k)
+        if self.relation is not None:
+            bias = self.relation(relations).permute(0, 2, 1)
+            if relation_gate is not None:
+                if relation_gate.shape != (b, p):
+                    raise ValueError('Root relation_gate must be [B,P]')
+                bias = bias * relation_gate.unsqueeze(1)
+            scores = scores + bias.repeat_interleave(m, dim=-1).unsqueeze(2)
+        valid = valid_nodes.repeat_interleave(m, dim=1)
+        if self.mode == 'standard_attention':
+            code = scores.masked_fill(~valid[:, None, None, :], -torch.inf).softmax(dim=-1)
+            out = torch.einsum('bhqk,bkhd->bqhd', code, v)
+        else:
+            mask = valid.unsqueeze(1).expand(-1, m, -1)
+            code = head_rms(scores, mask)
+            out = hypernetwork_contract(code, v, nonlinear=self.mode == 'hypernetwork_relu')
+        out = self.norm(root_tokens + self.output(out.reshape(b, m, d)))
+        z = out.mean(dim=1)
+        return (z, code) if return_routing else z
 # ===== FedG2C ADD END A =====

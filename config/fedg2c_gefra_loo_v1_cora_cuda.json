@@ -13,7 +13,12 @@
       "graph": 64,
       "node": 1024
     },
-    "target_overrides": {},
+    "target_overrides": {
+      "pubmed": {"crop_cache_mb": 256},
+      "photo": {"crop_cache_mb": 1024},
+      "computers": {"crop_cache_mb": 1024},
+      "wikics": {"crop_cache_mb": 2048}
+    },
     "training_overrides": {},
     "k_shots": [
       -1,
@@ -145,7 +150,8 @@
       "evaluate_test": true,
       "grad_clip": 5.0,
       "eval_batch_size": 8,
-      "crop_cache_mb": 128
+      "crop_cache_mb": 128,
+      "precompute_topology": true
     }
   }
 }

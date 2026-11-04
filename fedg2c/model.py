@@ -80,6 +80,12 @@ class SharedBackbone(nn.Module):
         z = self.composer.forward_batch(batch.pad(h), batch.relations(h.dtype), batch.valid_nodes)
         return batch.unpad(z)
 
+    def compose_roots(self, h, batch, roots, relations=None):
+        """Compose only node-target queries while retaining all view context."""
+        if relations is None:
+            relations = batch.root_relations(roots, h.dtype)
+        return self.composer.forward_roots(batch.pad(h), roots, relations.to(h.dtype), batch.valid_nodes)
+
     def forward_batch(self, x, batch, edge_attr=None):
         return self.compose_batch(self.encode_experts(x, batch.edge_index, edge_attr), batch)
     # ===== FedG2C ADD END A/C =====

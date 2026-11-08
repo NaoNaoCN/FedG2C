@@ -26,19 +26,40 @@ class TargetConfig:
     max_nodes: int = 128
     node_hops: int = 2
     seed: int = 2026
+    # Validation controls; defaults preserve the historical training protocol.
+    selection_metric: str = 'loss'
+    early_stopping_patience: int = 0
+    evaluate_test: bool = True
+    grad_clip: float = 5.0
+    microbatch_size: int = 1
+    eval_interval: int = 1
+    k_shot: int = -1
 
     def __post_init__(self):
         if self.adaptation not in ('none', 'lora', 'adapter', 'prompt'):
             raise ValueError('Unknown adaptation')
-        for k in ('rank', 'bottleneck', 'epochs', 'batch_size', 'max_nodes', 'node_hops'):
+        for k in ('rank', 'bottleneck', 'epochs', 'node_hops', 'microbatch_size', 'eval_interval'):
             if type(getattr(self, k)) is not int or getattr(self, k) < 1:
                 raise ValueError(f'{k} must be a positive integer')
+        for k in ('batch_size', 'max_nodes'):
+            if type(getattr(self, k)) is not int or getattr(self, k) < 0:
+                raise ValueError(f'{k} must be a nonnegative integer (0 means full)')
+        if type(self.k_shot) is not int or (self.k_shot != -1 and self.k_shot < 1):
+            raise ValueError('k_shot must be -1 or positive')
         if not 0 <= self.local_alpha <= 1 or (self.learnable_alpha and not 0 < self.local_alpha < 1):
             raise ValueError('Alpha must be in [0,1]; learnable alpha needs an interior initialization')
         if not all(math.isfinite(v) for v in (self.lr, self.weight_decay, self.lora_alpha)):
             raise ValueError('Nonfinite optimizer/LoRA setting')
         if self.lr <= 0 or self.weight_decay < 0 or self.lora_alpha <= 0:
             raise ValueError('Invalid optimizer/LoRA setting')
+        if self.selection_metric not in ('loss', 'roc_auc', 'average_precision', 'accuracy'):
+            raise ValueError('Unsupported validation selection metric')
+        if type(self.early_stopping_patience) is not int or self.early_stopping_patience < 0:
+            raise ValueError('early_stopping_patience must be a nonnegative integer')
+        if type(self.evaluate_test) is not bool:
+            raise ValueError('evaluate_test must be boolean')
+        if not math.isfinite(self.grad_clip) or self.grad_clip <= 0:
+            raise ValueError('grad_clip must be positive and finite')
 
 
 def load_shared(path):

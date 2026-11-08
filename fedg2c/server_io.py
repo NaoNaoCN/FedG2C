@@ -70,7 +70,7 @@ def load_uploads(paths):
     return first,[p['state_dict'] for p in payloads],provenance
 
 
-def save_aggregation(folder,state,model_config,server_config,report,provenance,probe_banks):
+def save_aggregation(folder,state,model_config,server_config,report,provenance,probe_banks,*,save_checkpoint=True):
     folder=Path(folder)
     metadata={'schema_version':3,'shared_schema_version':1,'stage':'server_aggregation',
               'config':model_config.to_dict(),'server_config':server_config.to_dict(),
@@ -78,9 +78,10 @@ def save_aggregation(folder,state,model_config,server_config,report,provenance,p
               'relation_schema':RELATION_SCHEMA,'provenance':provenance,
               'state_sha256':state_digest(state),'torch_version':str(torch.__version__),
               'reference_code_manifest':'third_party_references/module_b/manifest.json'}
-    torch.save({'metadata':metadata,'state_dict':state},folder/'shared_backbone.pt')
+    if save_checkpoint:
+        torch.save({'metadata':metadata,'state_dict':state},folder/'shared_backbone.pt')
     (folder/'aggregation_report.json').write_text(json.dumps(report,indent=2,allow_nan=False)+'\n')
     (folder/'run_metadata.json').write_text(json.dumps(metadata,indent=2,allow_nan=False)+'\n')
-    if probe_banks is not None:
+    if save_checkpoint and probe_banks is not None:
         torch.save(probe_banks,folder/'server_probes.pt')
 # ===== FedG2C ADD END B =====

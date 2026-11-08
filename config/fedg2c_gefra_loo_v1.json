@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "matrix": {
+    "groups": ["graph", "node"],
+    "data_root": "runs/gefra_loo_v1_data",
+    "cache_root": "cache_data",
+    "feature_policy": "native",
+    "source_ineligible_policy": "exclude",
+    "node_target_max_nodes": 256,
+    "source_batch_size": {"graph": 64, "node": 1024},
+    "target_overrides": {},
+    "training_overrides": {},
+    "k_shots": [-1, 5, 1],
+    "fine_tune_seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  },
+  "run": {
+    "output": "runs/gefra_loo_v1",
+    "seed": 2026,
+    "device": "cpu",
+    "threads": 1
+  },
+  "stage1": {
+    "training": {
+      "rounds": 100,
+      "local_budget": {"unit": "epochs", "amount": 5},
+      "views_per_graph": 1,
+      "batch_size": 64,
+      "sampling_unit": "graph",
+      "log_every": 100
+    },
+    "module_a": {
+      "edge_mask_rate": 0.2,
+      "feature_mask_rate": 0.2,
+      "hidden_dim": 128,
+      "num_experts": 3,
+      "num_heads": 4,
+      "num_layers": 2,
+      "backbone": "mysage",
+      "composer": "hypernetwork_relu",
+      "relation_condition": true,
+      "max_nodes": 32,
+      "context_hops": 2,
+      "prediction_hops": 1,
+      "undirected": true,
+      "position_encoding": "random_walk",
+      "walk_steps": [1, 2, 3, 4, 5, 6, 7, 8],
+      "predictor_type": "graphsage",
+      "predictor_dim": 128,
+      "predictor_heads": 4,
+      "predictor_depth": 2,
+      "momentum": 0.99,
+      "dropout": 0.0,
+      "lr": 0.001,
+      "weight_decay": 0.00001,
+      "grad_clip": 1.0
+    },
+    "module_b": {
+      "block_sizes": [8, 8],
+      "edge_probs": [[0.5, 0.1], [0.1, 0.5]],
+      "calibration_graphs": 4,
+      "diagnostic_graphs": 2,
+      "readout_pairs": 16,
+      "directions": 2,
+      "epsilon": 0.01,
+      "steps": 10,
+      "lr": 0.05,
+      "output_weight": 1.0,
+      "response_weight": 1.0,
+      "prior_weight": 0.001,
+      "seed": 2026,
+      "mode": "response",
+      "feature_std": 1.0,
+      "directed": false
+    }
+  },
+  "stage2": {
+    "checkpoint": null,
+    "adaptations": ["none", "lora", "adapter", "prompt"],
+    "target": {
+      "rank": 4,
+      "lora_alpha": 4.0,
+      "bottleneck": 8,
+      "local_alpha": 0.0,
+      "learnable_alpha": false,
+      "epochs": 20,
+      "batch_size": 0,
+      "microbatch_size": 1,
+      "lr": 0.0001,
+      "weight_decay": 0.01,
+      "max_nodes": 256,
+      "node_hops": 2,
+      "selection_metric": "loss",
+      "eval_interval": 10,
+      "early_stopping_patience": 4,
+      "evaluate_test": false,
+      "grad_clip": 5.0
+    }
+  }
+}

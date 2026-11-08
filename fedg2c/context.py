@@ -35,8 +35,8 @@ class ContextPair:
 
 def validate_graph(graph):
     x, edges = graph.x, graph.edge_index
-    if x.ndim != 2 or x.shape[0] < 2 or not torch.isfinite(x).all():
-        raise ValueError("Graph requires finite [N,F] features and at least two nodes")
+    if x.ndim != 2 or x.shape[0] < 1 or not torch.isfinite(x).all():
+        raise ValueError("Graph requires finite nonempty [N,F] features")
     if edges.dtype != torch.long or edges.ndim != 2 or edges.shape[0] != 2:
         raise ValueError("edge_index must be int64 [2,E]")
     if edges.numel() and (edges.min() < 0 or edges.max() >= x.shape[0]):

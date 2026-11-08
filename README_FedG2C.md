@@ -1,6 +1,6 @@
 # FedG2C：关系条件专家组合学习
 
-更新：2026-10-09。基于完整复制的 Gefra，保留专家思想，新增不使用几何模块的训练路径。三个模块的代码与合成接口检查已接通；真实任务上的组合泛化效果尚待实验。原始 `README.md` 仍介绍 Gefra，本文件是 FedG2C 新路径的总览。
+更新：2026-11-08。`master` 为 FedG2C 正式维护分支，已整合预训练批处理、下游批处理、节点根 query 与有容量限制的拓扑缓存，以及检查点保留策略。日常使用仓库主目录，无须切换到开发工作树。FedG2C 基于 Gefra，保留专家思想，采用不使用几何模块的训练路径；真实任务上的组合泛化效果仍由实验检验。
 
 ## 1. 研究目的与模块职责
 
@@ -108,6 +108,16 @@ python finetune_fedg2c.py --use-new-design \
 历史产物可先用 `python scripts/fedg2c/prune_round_checkpoints.py runs --interval 20` 预览，再加 `--apply --audit runs/checkpoint_prune_audit.json` 执行。工具额外保留每组最新检查点及已存配置明确引用的检查点，不触及数据、日志、私有最终状态或下游模型。清理后只能对保留轮次重放服务器聚合，其他轮次仍可读取训练曲线和来源哈希。
 
 Gefra 跨数据集留一迁移协议（分子图与节点分类）由 `config/fedg2c_gefra_loo_v1.json` 配置，协议边界与运行命令见 [Gefra 留一迁移实验说明](docs/gefra_loo_v1.md)。
+
+预训练与微调的加速实现已并入正式代码。Cora CUDA 配置为 `config/fedg2c_gefra_loo_v1_cora_cuda.json`，启动方式为 `bash scripts/fedg2c/run_cora_formal_gpu.sh`；运行前可先执行：
+
+```bash
+python -m fedg2c.gefra_loo_matrix --config config/fedg2c_gefra_loo_v1_cora_cuda.json --targets cora --dry-run
+```
+
+该配置使用预训练物理批次 32、微调物理批次 4、评估批次 8；逻辑批次和优化器更新边界由各自原有设置控制。通用配置保留物理批次 1 的兼容默认值，可按显存调整 `physical_batch_size`、`microbatch_size` 和 `eval_batch_size`；节点根 query 自动使用，拓扑缓存由 `crop_cache_mb`、`precompute_topology` 控制。参数含义、数值等价边界和短基准见 [批处理与加速说明](docs/fedg2c-batching.md)。
+
+旧提交和实验工作树用于复现实验；配置中已有日期和 `batched` 输出目录名属于历史命名，不代表另一套正式代码。已有输出目录不能重复使用，重跑时应改为新的 `run.output`。
 
 ## 5. 依据、贡献与验证边界
 

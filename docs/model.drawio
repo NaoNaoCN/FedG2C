@@ -1,6 +1,6 @@
 <mxfile host="Electron">
   <diagram name="第 1 页" id="PKT5F3frkmZZM1-qBzAt">
-    <mxGraphModel dx="2934" dy="994" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="2620" dy="605" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -922,6 +922,9 @@
         </mxCell>
         <mxCell id="8jS7bVozNKA1y2pCm7a0-146" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=96;fontStyle=1" value="客户端训练" vertex="1">
           <mxGeometry height="290" width="360" x="-1310" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="7VSTH_eBuQW6e5FagBki-4" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="score + relation_gate*bias" vertex="1">
+          <mxGeometry height="30" width="100" x="820" y="660" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

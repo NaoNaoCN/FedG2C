@@ -6,7 +6,7 @@ import torch
 from torch import nn
 from .edge_config import EdgePredictionConfig
 from .model import SharedBackbone, FeatureAdapter, EdgePassingGraphEncoder
-from .context import structural_relations
+from .context import structural_relations, structural_relation_rows
 from .server_io import state_digest, RELATION_SCHEMA
 from .vendor.loralib import Linear as LoRALinear
 
@@ -32,18 +32,25 @@ class TargetConfig:
     evaluate_test: bool = True
     grad_clip: float = 5.0
     microbatch_size: int = 1
+    eval_batch_size: int = 1
+    crop_cache_mb: int = 128
+    precompute_topology: bool = True
     eval_interval: int = 1
     k_shot: int = -1
 
     def __post_init__(self):
         if self.adaptation not in ('none', 'lora', 'adapter', 'prompt'):
             raise ValueError('Unknown adaptation')
-        for k in ('rank', 'bottleneck', 'epochs', 'node_hops', 'microbatch_size', 'eval_interval'):
+        for k in ('rank', 'bottleneck', 'epochs', 'node_hops', 'microbatch_size', 'eval_batch_size', 'eval_interval'):
             if type(getattr(self, k)) is not int or getattr(self, k) < 1:
                 raise ValueError(f'{k} must be a positive integer')
         for k in ('batch_size', 'max_nodes'):
             if type(getattr(self, k)) is not int or getattr(self, k) < 0:
                 raise ValueError(f'{k} must be a nonnegative integer (0 means full)')
+        if type(self.crop_cache_mb) is not int or self.crop_cache_mb < 0:
+            raise ValueError('crop_cache_mb must be a nonnegative integer (0 disables caching)')
+        if type(self.precompute_topology) is not bool:
+            raise ValueError('precompute_topology must be boolean')
         if type(self.k_shot) is not int or (self.k_shot != -1 and self.k_shot < 1):
             raise ValueError('k_shot must be -1 or positive')
         if not 0 <= self.local_alpha <= 1 or (self.learnable_alpha and not 0 < self.local_alpha < 1):
@@ -155,7 +162,10 @@ class TargetModel(nn.Module):
     def alpha(self):
         return self.alpha_logit.sigmoid() if self.alpha_logit is not None else self.config.local_alpha
 
-    def forward(self, view, root=None):
+    def forward(self, view, root=None, root_relations=None):
+        node_target = self.task['level'] == 'node'
+        if node_target and (root is None or not 0 <= root < view.num_nodes):
+            raise ValueError('Node prediction needs the remapped root index')
         x = self.node_adapter(view.x)
         if (self.edge_adapter is None) != (view.edge_attr is None):
             raise ValueError('Edge attributes must match the explicit target schema')
@@ -165,23 +175,55 @@ class TargetModel(nn.Module):
             h = self.shared.encode_experts(x, view.edge_index, edge)
             if self.prompt is not None:
                 h = h + self.prompt
-            relations = structural_relations(view.edge_index, view.num_nodes, dtype=h.dtype)
-            z = self.shared.composer(h, relations)
+            if node_target:
+                roots = torch.tensor([root], dtype=torch.long, device=h.device)
+                relations = (structural_relation_rows(view.edge_index, view.num_nodes, roots, h.dtype)
+                             if root_relations is None else root_relations.unsqueeze(0).to(h.dtype))
+                z = self.shared.composer.forward_roots(h.unsqueeze(0), roots, relations)
+            else:
+                relations = structural_relations(view.edge_index, view.num_nodes, dtype=h.dtype)
+                z = self.shared.composer(h, relations)
             if self.adapter is not None:
                 z = self.adapter(z)
         if self.local_encoder is not None:
             local = self.local_encoder(x, view.edge_index, edge)
+            if node_target:
+                local = local[root:root+1]
             z = local if pure_local else self.alpha() * local + (1-self.alpha()) * z
         if self.task['level'] == 'graph':
             z = z.mean(dim=0, keepdim=True)
-        else:
-            if root is None or not 0 <= root < view.num_nodes:
-                raise ValueError('Node prediction needs the remapped root index')
-            z = z[root:root+1]
         return self.head(z)
 
     def frozen_base_unchanged(self):
         return state_digest({k:self.shared.state_dict()[k] for k in self.base_keys}) == self.base_sha256
+
+    def forward_batch(self, view, roots=None, root_relations=None):
+        node_target = self.task['level'] == 'node'
+        if node_target and (roots is None or roots.shape != (view.num_graphs,)):
+            raise ValueError('Node batch needs one remapped root per view')
+        x = self.node_adapter(view.x)
+        if (self.edge_adapter is None) != (view.edge_attr is None):
+            raise ValueError('Edge attributes must match the explicit target schema')
+        edge = self.edge_adapter(view.edge_attr) if self.edge_adapter is not None else None
+        pure_local = self.config.local_alpha == 1 and self.alpha_logit is None
+        if not pure_local:
+            h = self.shared.encode_experts(x, view.edge_index, edge)
+            if self.prompt is not None:
+                h = h + self.prompt
+            z = (self.shared.compose_roots(h, view, roots, root_relations) if node_target
+                 else self.shared.compose_batch(h, view))
+            if self.adapter is not None:
+                z = self.adapter(z)
+        if self.local_encoder is not None:
+            local = self.local_encoder(x, view.edge_index, edge)
+            if node_target:
+                local = local[view.offsets + roots]
+            z = local if pure_local else self.alpha() * local + (1-self.alpha()) * z
+        if self.task['level'] == 'graph':
+            pooled = z.new_zeros(view.num_graphs, z.shape[-1]).index_add(0, view.node_batch, z)
+            counts = view.valid_nodes.sum(dim=1, keepdim=True)
+            z = pooled / counts
+        return self.head(z)
 
     def parameter_report(self):
         groups = {}

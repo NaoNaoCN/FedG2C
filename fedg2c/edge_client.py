@@ -5,6 +5,7 @@ import time
 import torch
 from .edge_views import NeighborhoodEdgeSampler
 from .edge_model import NodewisePredictionModel
+from .batching import EdgePredictionBatch
 
 
 class EdgePredictionClient:
@@ -35,11 +36,15 @@ class EdgePredictionClient:
     # ===== FedG2C ADD END B =====
 
     def pretrain(self, graphs_factory, epochs=1, views_per_graph=1, seed=0, max_steps=None,
-                 log_every=0, batch_size=1, sampling_unit='graph'):
+                 log_every=0, batch_size=1, sampling_unit='graph', physical_batch_size=1):
         if epochs < 1 or views_per_graph < 1 or (max_steps is not None and max_steps < 1):
             raise ValueError("Training counts must be positive")
         if type(batch_size) is not int or batch_size < 1 or sampling_unit not in ('graph', 'node'):
             raise ValueError('Use positive batch_size and graph/node sampling_unit')
+        if type(physical_batch_size) is not int or physical_batch_size < 1:
+            raise ValueError('Use positive physical_batch_size')
+        if min(physical_batch_size, batch_size) > 1 and self.config.dropout:
+            raise ValueError('Use physical_batch_size=1 with dropout to preserve the scalar RNG stream')
         generator = torch.Generator().manual_seed(seed)
         optimizer = torch.optim.AdamW((p for p in self.model.parameters() if p.requires_grad),
                                      lr=self.config.lr, weight_decay=self.config.weight_decay)
@@ -47,7 +52,7 @@ class EdgePredictionClient:
         metrics, references = [], None
         parameters = [p for p in self.model.parameters() if p.requires_grad]
         optimizer.zero_grad(set_to_none=True)
-        pending, diagnostics = 0, {}
+        pending, diagnostics, buffered = 0, {}, []
         root_coverage, total_views = [], 0
         started = time.monotonic()
 
@@ -63,9 +68,14 @@ class EdgePredictionClient:
             optimizer.step()
             self.model.update_momentum()
             optimizer.zero_grad(set_to_none=True)
+            # Diagnostics stay on the device until an optimizer update. No
+            # per-view .item(), reference D2H copy, or GPU validation readback.
+            scalars = torch.stack((norm.detach(), diagnostics['loss'], diagnostics['context_std'])).cpu().tolist()
             item = {'step': len(metrics)+1, 'epoch': epoch+1, 'views': pending,
-                    'gradient_norm': float(norm),
-                    **{key: value / pending for key, value in diagnostics.items()}}
+                    'gradient_norm': scalars[0], 'loss': scalars[1] / pending,
+                    'context_std': scalars[2] / pending,
+                    **{key: value / pending for key, value in diagnostics.items()
+                       if key not in ('loss', 'context_std')}}
             metrics.append(item)
             if log_every and (len(metrics) == 1 or len(metrics) % log_every == 0):
                 print(json.dumps({'stage':'local_pretraining','client':self.client_id,
@@ -75,10 +85,41 @@ class EdgePredictionClient:
 
         def summary():
             result = self._summary(metrics, references)
-            result.update(batch_size=batch_size, sampling_unit=sampling_unit, total_views=total_views,
+            result.update(batch_size=batch_size, physical_batch_size=physical_batch_size,
+                          sampling_unit=sampling_unit, total_views=total_views,
                           loss_reduction='mean prediction-node loss per view, then mean independent views per update',
                           root_coverage=root_coverage)
             return result
+
+        def consume():
+            nonlocal pending, total_views, references, buffered
+            count = len(buffered)
+            if min(physical_batch_size, batch_size) == 1:
+                # Keep the scalar forward as a reference and for dropout runs.
+                loss, outputs = self.model(buffered[0].to(self.device))
+            else:
+                batch = EdgePredictionBatch.collate(buffered).to(self.device, non_blocking=True)
+                loss, outputs = self.model.forward_batch(batch)
+            if not torch.isfinite(loss):
+                raise FloatingPointError('Nonfinite node prediction loss')
+            loss.backward()
+            pending += count
+            total_views += count
+            current = outputs['reference']
+            references = current[-128:] if references is None else torch.cat((references, current))[-128:]
+            for key, value in (('loss', loss.detach()), ('context_std', outputs['context_std'].sum())):
+                diagnostics[key] = diagnostics.get(key, 0) + value
+            for pair in buffered:
+                values = {'view_nodes': pair.visible_view.num_nodes,
+                          'prediction_nodes': pair.prediction_indices.numel(),
+                          'reference_edge_arcs': pair.reference_view.edge_index.shape[1],
+                          'visible_edge_arcs': pair.visible_view.edge_index.shape[1],
+                          'removed_edge_arcs': pair.removed_edges,
+                          'masked_feature_channels': int((~pair.feature_keep).sum()),
+                          'feature_channels': len(pair.feature_keep)}
+                for key, value in values.items():
+                    diagnostics[key] = diagnostics.get(key, 0) + value
+            buffered = []
 
         # Node clients have one large graph; retain its adjacency index across
         # epochs, while graph datasets retain only one transient small index.
@@ -96,27 +137,11 @@ class EdgePredictionClient:
                 covered = []
                 for root in order:
                   for _ in range(views_per_graph):
-                    pair = sampler.sample_edge_view(self.config, self.feature_channels, generator, root).to(self.device)
-                    loss, outputs = self.model(pair)
-                    if not torch.isfinite(loss):
-                        raise FloatingPointError("Nonfinite node prediction loss")
-                    loss.backward()
-                    pending += 1
-                    total_views += 1
+                    buffered.append(sampler.sample_edge_view(self.config, self.feature_channels, generator, root))
                     if root is not None:
                         covered.append(root)
-                    current = outputs["reference"].cpu()
-                    references = current[-128:] if references is None else torch.cat([references, current])[-128:]
-                    diagnostic = {"loss": loss.item(), "context_std": outputs["context_std"].item(),
-                                    "view_nodes": pair.visible_view.num_nodes,
-                                    "prediction_nodes": pair.prediction_indices.numel(),
-                                    "reference_edge_arcs": pair.reference_view.edge_index.shape[1],
-                                    "visible_edge_arcs": pair.visible_view.edge_index.shape[1],
-                                    "removed_edge_arcs": pair.removed_edges,
-                                    "masked_feature_channels": int((~pair.feature_keep).sum()),
-                                    "feature_channels": len(pair.feature_keep)}
-                    for key, value in diagnostic.items():
-                        diagnostics[key] = diagnostics.get(key, 0) + value
+                    if len(buffered) == min(physical_batch_size, batch_size - pending):
+                        consume()
                     if pending == batch_size:
                         update(epoch)
                         if max_steps is not None and len(metrics) >= max_steps:
@@ -129,6 +154,8 @@ class EdgePredictionClient:
                     root_coverage.append({'epoch':epoch+1, 'graph':graph_id,
                         'eligible_roots':len(order), 'roots_visited':len(set(covered)), 'complete':True})
             # Do not merge the final incomplete logical batch across epochs.
+            if buffered:
+                consume()
             if pending:
                 update(epoch)
                 if max_steps is not None and len(metrics) >= max_steps:

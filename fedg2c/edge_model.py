@@ -34,6 +34,24 @@ class MaskedEncodingBranch(EncodingBranch):
         edge = self.edge_adapter(view.edge_attr) if self.edge_adapter is not None else None
         return self.shared(x, view.edge_index, edge)
 
+    def forward_batch(self, view, feature_keep=None):
+        categorical = bool(self.node_adapter.cardinalities)
+        raw = view.x
+        channels = self.shared.composer.dim if categorical else raw.shape[1]
+        if feature_keep is not None and (feature_keep.dtype != torch.bool or
+                                         feature_keep.shape != (view.num_graphs, channels)):
+            raise ValueError('Expected one boolean channel mask per view')
+        keep = None if feature_keep is None else feature_keep[view.node_batch]
+        if keep is not None and not categorical:
+            raw = raw * keep.to(raw.dtype)
+        x = self.node_adapter(raw)
+        if keep is not None and categorical:
+            x = x * keep.to(x.dtype)
+        if (self.edge_adapter is None) != (view.edge_attr is None):
+            raise ValueError('Edge attributes must match the private feature schema')
+        edge = self.edge_adapter(view.edge_attr) if self.edge_adapter is not None else None
+        return self.shared.forward_batch(x, view, edge)
+
 
 class NodewisePredictionModel(nn.Module):
     """Main branch learns; momentum branch supplies detached per-node references.
@@ -103,4 +121,34 @@ class NodewisePredictionModel(nn.Module):
         loss = F.smooth_l1_loss(prediction, reference)
         return loss, {"prediction": prediction.detach(), "reference": reference.detach(),
                       "context_std": main_z.detach().std(dim=0, unbiased=False).mean()}
+
+    # ===== FedG2C ADD BEGIN A: same per-view objective in a physical batch =====
+    def forward_batch(self, pair):
+        if self.training and self.config.dropout:
+            raise ValueError('Use microbatch_size=1 with dropout to preserve the scalar RNG stream')
+        view, q = pair.visible_view, pair.prediction_indices
+        main_z = self.main_branch.forward_batch(view, pair.feature_keep)
+        # Both relation and random-walk matrices use THIS view's masked edges.
+        position = view.walk_encoding(self.config.walk_steps, main_z.dtype)
+        if self.config.predictor_type == 'graphsage':
+            prediction = self.predictor(main_z, position, q, view.edge_index)
+        else:
+            prediction = self.predictor.forward_batch(main_z, position, pair)
+        with torch.no_grad():
+            reference_z = self.momentum_branch.forward_batch(pair.reference_view)
+            reference = F.layer_norm(reference_z, (reference_z.shape[-1],))[q]
+        node_losses = F.smooth_l1_loss(prediction, reference, reduction='none').mean(dim=-1)
+        losses = node_losses.new_zeros(view.num_graphs).scatter_add(0, pair.query_batch, node_losses)
+        losses = losses / pair.query_counts
+        with torch.no_grad():
+            padded = view.pad(main_z.detach())
+            mask = view.valid_nodes.unsqueeze(-1)
+            counts = mask.sum(dim=1)
+            mean = (padded * mask).sum(dim=1) / counts
+            variance = ((padded - mean.unsqueeze(1)).square() * mask).sum(dim=1) / counts
+            context_std = variance.sqrt().mean(dim=-1)
+        # Sum here; the client divides gradients once by the logical view count.
+        return losses.sum(), {'losses': losses.detach(), 'prediction': prediction.detach(),
+                              'reference': reference.detach(), 'context_std': context_std}
+    # ===== FedG2C ADD END A =====
 # ===== FedG2C ADD END A =====

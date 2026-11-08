@@ -89,6 +89,7 @@ class CheckpointRetentionTests(unittest.TestCase):
                 output = base / str(interval)
                 pretrain(['--smoke', '--server-config', str(server_path), '--rounds', '21',
                           '--local-steps', '1', '--checkpoint-interval', str(interval),
+                          '--batch-size', '3', '--physical-batch-size', '2',
                           '--output', str(output)])
                 self.assertEqual(len(list(output.glob('round_*/client_0/metrics.json'))), 21)
                 self.assertEqual(len(list(output.glob('round_*/server/run_metadata.json'))), 21)

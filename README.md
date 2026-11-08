@@ -1,3 +1,9 @@
+# FedG2C
+
+`master` 是 FedG2C 的正式维护分支，包含预训练与微调加速、节点根 query、拓扑缓存和检查点保留策略。使用说明与正式入口见 [FedG2C 总览](README_FedG2C.md)，参数与性能验证边界见 [批处理与加速说明](docs/fedg2c-batching.md)。
+
+下文保留所基于的 Gefra 项目说明及其运行入口。
+
 # Gefra
 
 Gefra is a federated graph foundation model that combines multi-curvature

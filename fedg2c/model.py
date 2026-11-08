@@ -75,6 +75,21 @@ class SharedBackbone(nn.Module):
         r = structural_relations(edge_index, x.shape[0], dtype=h.dtype)
         return self.composer(h, r, relation_gate=relation_gate)
 
+    # ===== FedG2C ADD BEGIN A/C: message edges are disjoint; composer is batched =====
+    def compose_batch(self, h, batch):
+        z = self.composer.forward_batch(batch.pad(h), batch.relations(h.dtype), batch.valid_nodes)
+        return batch.unpad(z)
+
+    def compose_roots(self, h, batch, roots, relations=None):
+        """Compose only node-target queries while retaining all view context."""
+        if relations is None:
+            relations = batch.root_relations(roots, h.dtype)
+        return self.composer.forward_roots(batch.pad(h), roots, relations.to(h.dtype), batch.valid_nodes)
+
+    def forward_batch(self, x, batch, edge_attr=None):
+        return self.compose_batch(self.encode_experts(x, batch.edge_index, edge_attr), batch)
+    # ===== FedG2C ADD END A/C =====
+
 
 class EncodingBranch(nn.Module):
     def __init__(self, shared: SharedBackbone, input_dim, edge_dim=0, node_cardinalities=None, edge_cardinalities=None):

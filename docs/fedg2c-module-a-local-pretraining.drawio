@@ -1,6 +1,6 @@
 <mxfile host="Electron">
   <diagram id="fedg2c-module-a" name="模块 A 本地预训练">
-    <mxGraphModel dx="2570" dy="1580" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2160" pageHeight="1740" background="#FFFFFF" math="0" shadow="0" adaptiveColors="auto">
+    <mxGraphModel dx="623" dy="464" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2160" pageHeight="1740" background="#FFFFFF" math="0" shadow="0" adaptiveColors="auto">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -95,7 +95,7 @@
           <mxGeometry height="80" width="190" x="480" y="875" as="geometry" />
         </mxCell>
         <mxCell id="relations" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" value="&lt;b style=&quot;font-size:15px&quot;&gt;structural_relations&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.4&quot;&gt;由可见边重建 R [N,N,3]&lt;/div&gt;" vertex="1">
-          <mxGeometry height="80" width="220" x="895" y="875" as="geometry" />
+          <mxGeometry height="80" width="220" x="890" y="875" as="geometry" />
         </mxCell>
         <mxCell id="position" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=middle;fontFamily=Microsoft YaHei;fontSize=16;spacing=7;strokeWidth=1.5;fillColor=#FFFFFF;strokeColor=#666666;fontColor=#202020;" tooltip="fedg2c/structural_encoding.py:12-25" value="&lt;b style=&quot;font-size:15px&quot;&gt;random_walk_encoding&lt;/b&gt;&lt;div style=&quot;font-size:14px;line-height:1.4&quot;&gt;diag(T¹)…diag(Tᴷ)&lt;/div&gt;&lt;div style=&quot;font-size:14px;line-height:1.4&quot;&gt;position [N,K]&lt;/div&gt;" vertex="1">
           <mxGeometry height="80" width="250" x="1340" y="875" as="geometry" />
@@ -151,7 +151,7 @@
         <mxCell id="module-a-edge-15" edge="1" parent="1" source="visible-edges" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=18;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;exitPerimeter=1;entryPerimeter=1;" target="relations" value="">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="module-a-edge-16" edge="1" parent="1" source="relations" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=18;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;exitX=0.5;exitY=0;entryX=0.8;entryY=1;exitPerimeter=1;entryPerimeter=1;" target="composer" value="R">
+        <mxCell id="module-a-edge-16" edge="1" parent="1" source="relations" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=18;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;" target="composer" value="R">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="module-a-edge-17" edge="1" parent="1" source="visible-edges" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=18;html=1;endArrow=block;endFill=1;strokeWidth=1.5;strokeColor=#303030;fontFamily=Microsoft YaHei;fontSize=14;fontColor=#303030;labelBackgroundColor=#FFFFFF;jumpStyle=arc;jumpSize=7;dashed=0;" target="position" value="">

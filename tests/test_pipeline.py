@@ -46,6 +46,10 @@ class PipelineTests(unittest.TestCase):
     def test_exact_steps_two_stages_and_reload(self):
         root = self.folder/'steps'
         self.assertEqual(json.loads((root/'status.json').read_text())['state'], 'completed')
+        policy = json.loads((root/'stage1/checkpoint_policy.json').read_text())
+        self.assertEqual(policy['interval'], 20)
+        self.assertEqual(policy['saved_round_ids'], [1])
+        self.assertFalse((root/'stage1/round_000/server/shared_backbone.pt').exists())
         for path in (root/'stage1').glob('round_*/client_*/metrics.json'):
             self.assertEqual(len(json.loads(path.read_text())['steps']), 3)
         summary = json.loads((root/'summary.json').read_text())
@@ -72,6 +76,31 @@ class PipelineTests(unittest.TestCase):
             indices = report['sampling']['graph_indices']
             self.assertEqual(set(indices[:3]), {0,1,2})
             self.assertEqual(set(indices[3:]), {0,1,2})
+
+    def test_batched_pipeline_preserves_logical_steps_and_reload_all_adaptations(self):
+        cfg = copy.deepcopy(self.config)
+        cfg['run']['output'] = str(self.folder/'batched')
+        cfg['stage1']['training'].update(rounds=3, batch_size=5, physical_batch_size=3,
+                                        checkpoint_interval=2,
+                                        local_budget={'unit':'epochs','amount':2}, views_per_graph=1)
+        cfg['stage2']['target'].update(microbatch_size=3, eval_batch_size=2)
+        execute(cfg)
+        root = self.folder/'batched'
+        policy = json.loads((root/'stage1/checkpoint_policy.json').read_text())
+        self.assertEqual(policy['interval'], 2)
+        self.assertEqual(policy['saved_round_ids'], [1, 2])
+        saved = [path.parent.parent.name for path in
+                 sorted((root/'stage1').glob('round_*/server/shared_backbone.pt'))]
+        self.assertEqual(saved, ['round_001', 'round_002'])
+        for path in (root/'stage1/round_000').glob('client_*/metrics.json'):
+            report = json.loads(path.read_text())
+            self.assertEqual([s['views'] for s in report['steps']], [3, 3])
+            self.assertEqual(report['physical_batch_size'], 3)
+        for mode in ('none','lora','adapter','prompt'):
+            model, meta = load_target_model(root/'stage2'/mode/'target_model.pt')
+            self.assertTrue(model.frozen_base_unchanged())
+            self.assertEqual(meta['config']['microbatch_size'], 3)
+            self.assertEqual(meta['config']['eval_batch_size'], 2)
 
     def test_validation_only_does_not_open_test_files(self):
         manifest = json.loads(Path(self.config['data']['target_manifest']).read_text())

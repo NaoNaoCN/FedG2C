@@ -127,4 +127,18 @@ def structural_relations(edge_index, num_nodes, dtype=torch.float32):
     identity = torch.eye(num_nodes, device=edge_index.device, dtype=dtype)
     two_hop = (adjacency @ adjacency > 0).to(dtype)
     return torch.stack([identity, adjacency, two_hop], dim=-1)
+
+
+def structural_relation_rows(edge_index, num_nodes, queries, dtype=torch.float32):
+    """Selected rows of structural_relations, retaining every intermediate node.
+
+    The descriptor is static topology, so compute reachability in float32 even
+    when the caller stores its three binary channels as bool.
+    """
+    adjacency = torch.zeros(num_nodes, num_nodes, device=edge_index.device, dtype=torch.float32)
+    adjacency[edge_index[0], edge_index[1]] = 1
+    direct = adjacency[queries]
+    identity = queries[:, None] == torch.arange(num_nodes, device=queries.device)
+    two_hop = direct @ adjacency > 0
+    return torch.stack((identity, direct.bool(), two_hop), dim=-1).to(dtype)
 # ===== FedG2C ADD END A =====

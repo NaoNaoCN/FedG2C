@@ -36,6 +36,15 @@ class EdgePredictionConfig:
     lr: float = 0.001
     weight_decay: float = 0.00001
     grad_clip: float = 5.0
+    # Optional VICReg-style floor across distinct source roots in one logical
+    # batch.  The zero default preserves the original objective exactly.
+    variance_weight: float = 0.0
+    variance_target: float = 0.05
+    variance_eps: float = 1e-4
+    variance_representation: str = "composed"
+    variance_view: str = "visible"
+    # Explicit opt-in keeps historical checkpoints/configs reproducible.
+    private_adapter_bias_init: str = "default"
 
     def __post_init__(self):
         # ===== FedG2C ADD BEGIN A： validate explicit predictor route =====
@@ -63,6 +72,19 @@ class EdgePredictionConfig:
             raise ValueError("Invalid optimizer parameters")
         if not math.isfinite(self.grad_clip) or self.grad_clip <= 0:
             raise ValueError("grad_clip must be positive and finite")
+        if (not all(math.isfinite(v) for v in
+                    (self.variance_weight, self.variance_target, self.variance_eps))
+                or self.variance_weight < 0 or self.variance_target <= 0
+                or self.variance_eps <= 0):
+            raise ValueError("Invalid variance regularization parameters")
+        if self.variance_weight and self.dropout:
+            raise ValueError("Two-pass root variance regularization requires dropout=0")
+        if self.variance_representation not in ("composed", "experts", "both"):
+            raise ValueError("variance_representation must be composed, experts or both")
+        if self.variance_view not in ("visible", "reference"):
+            raise ValueError("variance_view must be visible or reference")
+        if self.private_adapter_bias_init not in ("default", "zero"):
+            raise ValueError("private_adapter_bias_init must be default or zero")
         if self.backbone not in ("mysage", "gcn", "sage", "gat", "gin"):
             raise ValueError("Unsupported backbone")
         if self.composer not in ("hypernetwork_relu", "hypernetwork_linear", "standard_attention", "linear_gate"):

@@ -24,7 +24,7 @@ class ResponseAggregationConfig:
     directed: bool = False
 
     def __post_init__(self):
-        if self.mode not in ('fedavg', 'output_only', 'response'):
+        if self.mode not in ('fedavg', 'sample_weighted', 'output_only', 'response'):
             raise ValueError('Unknown aggregation mode')
         if not self.block_sizes or any(type(n) is not int or n < 1 for n in self.block_sizes):
             raise ValueError('Positive integer block sizes required')

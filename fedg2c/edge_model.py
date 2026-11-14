@@ -9,13 +9,29 @@ from .node_predictor import NodeRepresentationPredictor
 from .structural_encoding import random_walk_encoding
 
 
+def variance_floor_loss(values, target, eps):
+    """Penalize channel standard deviations below ``target``.
+
+    ``values`` is [root, channel] or [root, expert, channel]. Statistics are
+    across roots independently per channel/expert within one logical batch.
+    Physical chunks must not define this statistic.
+    """
+    if values.ndim not in (2, 3) or values.shape[0] < 2:
+        return values.new_zeros(())
+    # A 3-D tensor is [root, expert, channel].  The statistic is evaluated
+    # across roots independently for each expert, so different expert means
+    # cannot hide a collapse shared by every root.
+    std = torch.sqrt(values.var(dim=0, unbiased=False) + eps)
+    return F.relu(values.new_tensor(target) - std).mean()
+
+
 class MaskedEncodingBranch(EncodingBranch):
     """BGRL channel mask before continuous projection; after category embedding.
 
     Category IDs are never zeroed: zero can be a valid atom/bond category.
     The latter placement is our input-schema adaptation, not BGRL's original.
     """
-    def forward(self, view, feature_keep=None):
+    def forward(self, view, feature_keep=None, return_experts=False):
         categorical = bool(self.node_adapter.cardinalities)
         raw = view.x
         if feature_keep is not None:
@@ -32,9 +48,9 @@ class MaskedEncodingBranch(EncodingBranch):
         if self.edge_adapter is None and view.edge_attr is not None:
             raise ValueError("Unexpected edge features; specify the private schema")
         edge = self.edge_adapter(view.edge_attr) if self.edge_adapter is not None else None
-        return self.shared(x, view.edge_index, edge)
+        return self.shared(x, view.edge_index, edge, return_experts=return_experts)
 
-    def forward_batch(self, view, feature_keep=None):
+    def forward_batch(self, view, feature_keep=None, return_experts=False):
         categorical = bool(self.node_adapter.cardinalities)
         raw = view.x
         channels = self.shared.composer.dim if categorical else raw.shape[1]
@@ -50,7 +66,7 @@ class MaskedEncodingBranch(EncodingBranch):
         if (self.edge_adapter is None) != (view.edge_attr is None):
             raise ValueError('Edge attributes must match the private feature schema')
         edge = self.edge_adapter(view.edge_attr) if self.edge_adapter is not None else None
-        return self.shared.forward_batch(x, view, edge)
+        return self.shared.forward_batch(x, view, edge, return_experts=return_experts)
 
 
 class NodewisePredictionModel(nn.Module):
@@ -104,7 +120,11 @@ class NodewisePredictionModel(nn.Module):
             raise ValueError("Need nonempty one-dimensional prediction indices")
         if q.min() < 0 or q.max() >= pair.visible_view.num_nodes:
             raise ValueError("Prediction index outside local view")
-        main_z = self.main_branch(pair.visible_view, pair.feature_keep)
+        tracked = bool(self.config.variance_weight and
+                       self.config.variance_representation in ('experts', 'both'))
+        main_result = self.main_branch(pair.visible_view, pair.feature_keep,
+                                       return_experts=tracked)
+        main_z, main_experts = main_result if tracked else (main_result, None)
         # Recompute AFTER edge masking. No cached full-graph encoding is read.
         position = random_walk_encoding(pair.visible_view.edge_index, len(main_z),
                                         self.config.walk_steps, main_z.dtype)
@@ -119,15 +139,25 @@ class NodewisePredictionModel(nn.Module):
             reference_z = self.momentum_branch(pair.reference_view)
             reference = F.layer_norm(reference_z, (reference_z.shape[-1],))[q]
         loss = F.smooth_l1_loss(prediction, reference)
-        return loss, {"prediction": prediction.detach(), "reference": reference.detach(),
-                      "context_std": main_z.detach().std(dim=0, unbiased=False).mean()}
+        outputs = {"prediction": prediction.detach(), "reference": reference.detach(),
+                   "context_std": main_z.detach().std(dim=0, unbiased=False).mean()}
+        if self.config.variance_weight:
+            values = main_experts if self.config.variance_representation == 'experts' else main_z
+            outputs["online_roots"] = values[pair.root_index:pair.root_index + 1]
+            if self.config.variance_representation == 'both':
+                outputs["online_expert_roots"] = main_experts[pair.root_index:pair.root_index + 1]
+        return loss, outputs
 
     # ===== FedG2C ADD BEGIN A: same per-view objective in a physical batch =====
     def forward_batch(self, pair):
         if self.training and self.config.dropout:
             raise ValueError('Use microbatch_size=1 with dropout to preserve the scalar RNG stream')
         view, q = pair.visible_view, pair.prediction_indices
-        main_z = self.main_branch.forward_batch(view, pair.feature_keep)
+        tracked = bool(self.config.variance_weight and
+                       self.config.variance_representation in ('experts', 'both'))
+        main_result = self.main_branch.forward_batch(view, pair.feature_keep,
+                                                     return_experts=tracked)
+        main_z, main_experts = main_result if tracked else (main_result, None)
         # Both relation and random-walk matrices use THIS view's masked edges.
         position = view.walk_encoding(self.config.walk_steps, main_z.dtype)
         if self.config.predictor_type == 'graphsage':
@@ -148,7 +178,13 @@ class NodewisePredictionModel(nn.Module):
             variance = ((padded - mean.unsqueeze(1)).square() * mask).sum(dim=1) / counts
             context_std = variance.sqrt().mean(dim=-1)
         # Sum here; the client divides gradients once by the logical view count.
-        return losses.sum(), {'losses': losses.detach(), 'prediction': prediction.detach(),
-                              'reference': reference.detach(), 'context_std': context_std}
+        outputs = {'losses': losses.detach(), 'prediction': prediction.detach(),
+                   'reference': reference.detach(), 'context_std': context_std}
+        if self.config.variance_weight:
+            values = main_experts if self.config.variance_representation == 'experts' else main_z
+            outputs['online_roots'] = values[pair.root_indices]
+            if self.config.variance_representation == 'both':
+                outputs['online_expert_roots'] = main_experts[pair.root_indices]
+        return losses.sum(), outputs
     # ===== FedG2C ADD END A =====
 # ===== FedG2C ADD END A =====

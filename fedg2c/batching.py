@@ -114,6 +114,7 @@ class EdgePredictionBatch:
     query_batch: torch.Tensor
     query_local: torch.Tensor
     query_counts: torch.Tensor
+    root_indices: torch.Tensor
     feature_keep: torch.Tensor
 
     @classmethod
@@ -134,6 +135,7 @@ class EdgePredictionBatch:
                    torch.cat([p.prediction_indices + offset for p, offset in zip(pairs, visible.offsets)]),
                    torch.repeat_interleave(torch.arange(len(pairs)), counts),
                    torch.cat([torch.arange(n) for n in counts.tolist()]), counts,
+                   visible.offsets + torch.tensor([p.root_index for p in pairs]),
                    torch.stack([p.feature_keep for p in pairs]))
 
     def to(self, device, non_blocking=False):

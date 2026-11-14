@@ -67,6 +67,9 @@ def load_uploads(paths):
                 'initial_shared_sha256':fingerprints[0],
                 'initialization_check':'matching fingerprint' if all(fingerprints) else 'legacy seed metadata only; common initialization and slot alignment assumed',
                 'uploads':[{'filename':Path(p).name,'sha256':hashlib.sha256(Path(p).read_bytes()).hexdigest()} for p in paths]}
+    if any('num_samples' in m for m in meta):
+        provenance['sample_counts'] = [m.get('num_samples') for m in meta]
+        provenance['sample_units'] = [m.get('sample_unit') for m in meta]
     return first,[p['state_dict'] for p in payloads],provenance
 
 

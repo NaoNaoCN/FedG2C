@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "matrix": {
+    "groups": [
+      "node"
+    ],
+    "data_root": "runs/gefra_loo_v1_data",
+    "cache_root": "/home/chenyh26/FedGFM2oE/P-FedExp/cache_data",
+    "feature_policy": "native",
+    "source_ineligible_policy": "exclude",
+    "node_target_max_nodes": 256,
+    "source_batch_size": {
+      "graph": 64,
+      "node": 1024
+    },
+    "target_overrides": {
+      "pubmed": {
+        "early_stopping_patience": 15,
+        "crop_cache_mb": 256,
+        "evaluate_test": false,
+        "precompute_topology": true
+      },
+      "photo": {
+        "early_stopping_patience": 15,
+        "crop_cache_mb": 1024,
+        "evaluate_test": false,
+        "precompute_topology": true
+      },
+      "computers": {
+        "early_stopping_patience": 15,
+        "crop_cache_mb": 1024,
+        "evaluate_test": false,
+        "precompute_topology": true,
+        "microbatch_size": 32
+      },
+      "wikics": {
+        "early_stopping_patience": 15,
+        "crop_cache_mb": 2048,
+        "evaluate_test": false,
+        "precompute_topology": true
+      },
+      "cora": {
+        "early_stopping_patience": 15,
+        "crop_cache_mb": 128,
+        "evaluate_test": false,
+        "precompute_topology": true
+      },
+      "citeseer": {
+        "early_stopping_patience": 15,
+        "crop_cache_mb": 128,
+        "evaluate_test": false,
+        "precompute_topology": true
+      }
+    },
+    "training_overrides": {},
+    "k_shots": [
+      5,
+      1,
+      -1
+    ],
+    "fine_tune_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "run": {
+    "output": "runs/nodes_ablation_20261114",
+    "seed": 2026,
+    "device": "cuda:0",
+    "threads": 1
+  },
+  "stage1": {
+    "training": {
+      "rounds": 100,
+      "local_budget": {
+        "unit": "epochs",
+        "amount": 5
+      },
+      "views_per_graph": 1,
+      "batch_size": 1024,
+      "sampling_unit": "node",
+      "log_every": 100,
+      "physical_batch_size": 128,
+      "checkpoint_interval": 20
+    },
+    "module_a": {
+      "edge_mask_rate": 0.2,
+      "feature_mask_rate": 0.2,
+      "hidden_dim": 128,
+      "num_experts": 5,
+      "num_heads": 4,
+      "num_layers": 2,
+      "backbone": "mysage",
+      "composer": "hypernetwork_relu",
+      "relation_condition": true,
+      "max_nodes": 32,
+      "context_hops": 2,
+      "prediction_hops": 1,
+      "undirected": false,
+      "position_encoding": "random_walk",
+      "walk_steps": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "predictor_type": "graphsage",
+      "predictor_dim": 128,
+      "predictor_heads": 4,
+      "predictor_depth": 2,
+      "momentum": 0.99,
+      "dropout": 0.0,
+      "lr": 0.001,
+      "weight_decay": 1e-05,
+      "grad_clip": 1.0,
+      "variance_weight": 1.0,
+      "variance_target": 0.15,
+      "variance_eps": 0.0001,
+      "variance_representation": "both",
+      "variance_view": "reference",
+      "private_adapter_bias_init": "zero"
+    },
+    "module_b": {
+      "block_sizes": [
+        8,
+        8
+      ],
+      "edge_probs": [
+        [
+          0.5,
+          0.1
+        ],
+        [
+          0.1,
+          0.5
+        ]
+      ],
+      "calibration_graphs": 4,
+      "diagnostic_graphs": 2,
+      "readout_pairs": 16,
+      "directions": 2,
+      "epsilon": 0.01,
+      "steps": 10,
+      "lr": 0.05,
+      "output_weight": 1.0,
+      "response_weight": 1.0,
+      "prior_weight": 0.001,
+      "seed": 2026,
+      "mode": "response",
+      "feature_std": 1.0,
+      "directed": false
+    }
+  },
+  "stage2": {
+    "checkpoint": null,
+    "adaptations": [
+      "lora"
+    ],
+    "target": {
+      "rank": 4,
+      "lora_alpha": 4.0,
+      "bottleneck": 8,
+      "local_alpha": 0.0,
+      "learnable_alpha": false,
+      "epochs": 1000,
+      "batch_size": 0,
+      "microbatch_size": 64,
+      "lr": 0.0001,
+      "weight_decay": 0.01,
+      "max_nodes": 256,
+      "node_hops": 2,
+      "selection_metric": "accuracy",
+      "eval_interval": 10,
+      "early_stopping_patience": 15,
+      "evaluate_test": false,
+      "grad_clip": 5.0,
+      "eval_batch_size": 64,
+      "crop_cache_mb": 128,
+      "precompute_topology": true
+    }
+  }
+}

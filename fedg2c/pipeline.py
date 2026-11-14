@@ -198,7 +198,7 @@ def preflight(cfg, stage):
         raise FileNotFoundError(prep['cache_root'])
     if stage == 'stage2':
         from .target_model import load_shared
-        _, source_cfg, _ = load_shared(cfg['stage2']['checkpoint'])
+        load_shared(cfg['stage2']['checkpoint'])
     # Catch incompatible mechanisms and selection rules before a long stage 1 run.
     from .data import read_manifest
     if stage in ('all','stage1') and Path(cfg['data']['source_manifest']).is_file():
@@ -211,16 +211,14 @@ def preflight(cfg, stage):
             if cfg['stage1']['module_a']['num_experts'] != len(manifest['clients']):
                 raise ValueError('module_a.num_experts must equal the explicit source-client count')
     module_a, module_b = cfg['stage1']['module_a'], cfg['stage1']['module_b']
+    if stage in ('all','stage1') and module_a['variance_weight'] and (
+            cfg['stage1']['training']['sampling_unit'] != 'node'
+            or cfg['stage1']['training']['views_per_graph'] != 1):
+        raise ValueError('Root variance requires sampling_unit=node and views_per_graph=1')
     if stage in ('all','stage1') and module_b['mode'] == 'response' and (
             module_a['composer'] == 'linear_gate' or not module_a['relation_condition']):
         raise ValueError('Response aggregation requires a relation-conditioned composer')
     if stage in ('all','stage2'):
-        if stage == 'stage2':
-            composer = source_cfg.composer
-        else:
-            composer = module_a['composer']
-        if 'lora' in cfg['stage2']['adaptations'] and composer == 'linear_gate':
-            raise ValueError('LoRA requires query/key projections; linear_gate has neither')
         target_path = Path(cfg['data']['target_manifest'])
         if target_path.is_file():
             manifest = json.loads(target_path.read_text())

@@ -32,10 +32,10 @@ def state_from_named_weights(weights):
     return state
 
 
-def client_message(state):
-    # Gefra uses num_samples=1. Keep it as a compatibility field; this module's
-    # uniform baseline/reference weights do not derive from target sample counts.
-    return {'num_samples': 1, 'weight': named_weights(state)}
+def client_message(state, num_samples=1):
+    if type(num_samples) is not int or num_samples < 1:
+        raise ValueError('num_samples must be a positive integer')
+    return {'num_samples': num_samples, 'weight': named_weights(state)}
 
 
 def states_from_client_messages(messages):
@@ -47,8 +47,8 @@ def states_from_client_messages(messages):
     for message in messages.values():
         if not isinstance(message, Mapping) or set(message) != {'num_samples', 'weight'}:
             raise ValueError('Use num_samples and weight only; geometry/private fields are not uploaded')
-        if type(message['num_samples']) is not int or message['num_samples'] != 1:
-            raise ValueError('Current Gefra-compatible protocol uses num_samples=1')
+        if type(message['num_samples']) is not int or message['num_samples'] < 1:
+            raise ValueError('num_samples must be a positive integer')
         states.append(state_from_named_weights(message['weight']))
     return states
 # ===== FedG2C ADD END B =====

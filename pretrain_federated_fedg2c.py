@@ -15,7 +15,7 @@ import torch
 from fedg2c.edge_config import EdgePredictionConfig
 from fedg2c.edge_client import EdgePredictionClient
 from fedg2c.model import SharedBackbone
-from fedg2c.data import read_manifest,iter_graphs,write_smoke_manifest
+from fedg2c.data import read_manifest,iter_graphs,write_smoke_manifest,count_source_samples
 from fedg2c.server_config import ResponseAggregationConfig
 from fedg2c.response_server import ResponsePreservingServer
 from fedg2c.server_io import state_digest,save_aggregation,RELATION_SCHEMA
@@ -29,7 +29,7 @@ def main(argv=None):
     source.add_argument('--source-manifest',type=Path)
     parser.add_argument('--config',type=Path)
     parser.add_argument('--server-config',type=Path,required=True)
-    parser.add_argument('--aggregation',choices=['fedavg','output_only','response'])
+    parser.add_argument('--aggregation',choices=['fedavg','sample_weighted','output_only','response'])
     parser.add_argument('--rounds',type=int,default=2)
     parser.add_argument('--checkpoint-interval',type=int,default=DEFAULT_CHECKPOINT_INTERVAL,
                         help='Save client/server weights and probes every N completed rounds and the final round')
@@ -79,6 +79,8 @@ def main(argv=None):
             if should_save_checkpoint(r,args.rounds,args.checkpoint_interval)]},indent=2)+'\n')
     if args.smoke:
         manifest=read_manifest(write_smoke_manifest(args.output/'smoke_inputs'))
+    source_counts = ([count_source_samples(r['graphs'], args.sampling_unit) for r in manifest['clients']]
+                     if server_config.mode == 'sample_weighted' else None)
     shared=SharedBackbone(config)
     server=ResponsePreservingServer(shared,server_config,args.device)
     clients=[EdgePredictionClient(r['id'],config,shared,r['feature_schema'],args.device) for r in manifest['clients']]
@@ -138,7 +140,10 @@ def main(argv=None):
             state=client.get_pretrain_model()
             uploads.append(state)
             # ===== FedG2C ADD BEGIN B：上传 Gefra 形状消息，不包含磁盘元数据 =====
-            local_messages[record['id']] = client.get_local_message()
+            num_samples = source_counts[index] if source_counts is not None else 1
+            local_messages[record['id']] = client.get_local_message(num_samples=num_samples)
+            if source_counts is not None:
+                local.update(num_samples=num_samples, sample_unit=args.sampling_unit)
             # ===== FedG2C ADD END B =====
             client_folder=folder/f'client_{index}'
             client_folder.mkdir()
@@ -149,6 +154,8 @@ def main(argv=None):
                       'local_epochs':args.local_epochs,'views_per_graph':args.views_per_graph,
                       'local_steps':args.local_steps,'batch_size':args.batch_size,
                       'sampling_unit':args.sampling_unit,'physical_batch_size':args.physical_batch_size}
+            if source_counts is not None:
+                metadata.update(num_samples=num_samples, sample_unit=args.sampling_unit)
             if save_checkpoint:
                 torch.save({'metadata':metadata,'client_id':record['id'],'state_dict':state},client_folder/'shared_backbone.pt')
             (client_folder/'metrics.json').write_text(json.dumps(local,indent=2,allow_nan=False)+'\n')

@@ -104,24 +104,39 @@ class ResponsePreservingServer:
                 'per_client_response_mse':per_response.cpu().tolist() if self.response_available else None,
                 'reference_response_rms':float(reference[1].square().mean().sqrt()) if self.response_available else None}
 
-    def execute(self,uploads,round_id=0,baseline_weights=None,reference_weights=None):
+    def execute(self,uploads,round_id=0,baseline_weights=None,reference_weights=None,*,sample_counts=None):
         if type(round_id) is not int or round_id<0:
             raise ValueError('Nonnegative integer round_id required')
         # ===== FedG2C ADD BEGIN B：Gefra 按客户端组织的上传消息；原列表接口保留 =====
         from collections.abc import Mapping
+        client_ids = None
         if isinstance(uploads, Mapping):
             from .messages import states_from_client_messages
-            uploads = states_from_client_messages(uploads)
+            messages = uploads
+            uploads = states_from_client_messages(messages)
+            client_ids = [str(cid) for cid in messages]
+            if sample_counts is not None:
+                raise ValueError('Message uploads already contain sample counts')
+            sample_counts = [message['num_samples'] for message in messages.values()]
         # ===== FedG2C ADD END B =====
         states=self.prepare_states(uploads)
+        if self.config.mode == 'sample_weighted':
+            if baseline_weights is not None:
+                raise ValueError('sample_weighted derives weights from sample_counts only')
+            if (sample_counts is None or len(sample_counts) != len(states)
+                    or any(type(n) is not int or n < 1 for n in sample_counts)):
+                raise ValueError('sample_weighted requires one positive integer sample count per client')
+            baseline_weights = sample_counts
         baseline=distribution(baseline_weights,len(states),self.device)
         rho=distribution(reference_weights,len(states),self.device)
         base_state=mix_parameters(states,baseline,self.parameter_names)
-        if self.config.mode=='fedavg':
-            # Exact Gefra fixed-average control; no probes or server optimization.
+        if self.config.mode in ('fedavg', 'sample_weighted'):
+            # Fixed convex aggregation; no probes or server optimization.
             self.last_probe_banks=None
             return {k:v.detach().cpu().clone() for k,v in base_state.items()}, {
-                'mode':'fedavg','round_id':round_id,'weights':baseline.cpu().tolist(),
+                'mode':self.config.mode,'round_id':round_id,'weights':baseline.cpu().tolist(),
+                'client_ids':client_ids,'sample_counts':sample_counts if self.config.mode == 'sample_weighted' else None,
+                'weighting':'source_sample_count' if self.config.mode == 'sample_weighted' else 'fixed',
                 'reference_weights':rho.cpu().tolist(),'optimization_steps':0,
                 'extra_client_exchanges':0,'probe_diagnostics':None}
         seed=self.config.seed+round_id*1000003

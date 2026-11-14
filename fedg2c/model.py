@@ -11,8 +11,10 @@ from .composer import RelationComposer
 
 class FeatureAdapter(nn.Module):
     """Private continuous projection OR explicit per-column category embeddings."""
-    def __init__(self, input_dim, hidden_dim, cardinalities=None):
+    def __init__(self, input_dim, hidden_dim, cardinalities=None, *, bias_init="default"):
         super().__init__()
+        if bias_init not in ("default", "zero"):
+            raise ValueError("bias_init must be default or zero")
         self.input_dim = input_dim
         self.cardinalities = tuple(cardinalities or ())
         if self.cardinalities:
@@ -21,6 +23,9 @@ class FeatureAdapter(nn.Module):
             self.embeddings = nn.ModuleList([nn.Embedding(c, hidden_dim) for c in self.cardinalities])
         else:
             self.projection = nn.Linear(input_dim, hidden_dim)
+            # Construct first to preserve RNG order; bias remains trainable.
+            if bias_init == "zero":
+                nn.init.zeros_(self.projection.bias)
 
     def forward(self, x):
         if x.ndim != 2 or x.shape[1] != self.input_dim:
@@ -57,6 +62,7 @@ class SharedBackbone(nn.Module):
     """Shared schema: experts.* and composer.* only, no private adapters/predictor."""
     def __init__(self, config):
         super().__init__()
+        self.private_adapter_bias_init = getattr(config, "private_adapter_bias_init", "default")
         # Same expert construction as Gefra EuclideanExperts, avoiding its geometry import.
         self.experts = nn.ModuleList([
             EdgePassingGraphEncoder(config.hidden_dim, config.hidden_dim, nn.ReLU,
@@ -70,10 +76,12 @@ class SharedBackbone(nn.Module):
     def encode_experts(self, x, edge_index, edge_attr=None):
         return torch.stack([expert(x, edge_index, edge_attr) for expert in self.experts], dim=1)
 
-    def forward(self, x, edge_index, edge_attr=None, relation_gate=None):
+    def forward(self, x, edge_index, edge_attr=None, relation_gate=None,
+                return_experts=False):
         h = self.encode_experts(x, edge_index, edge_attr)
         r = structural_relations(edge_index, x.shape[0], dtype=h.dtype)
-        return self.composer(h, r, relation_gate=relation_gate)
+        z = self.composer(h, r, relation_gate=relation_gate)
+        return (z, h) if return_experts else z
 
     # ===== FedG2C ADD BEGIN A/C: message edges are disjoint; composer is batched =====
     def compose_batch(self, h, batch):
@@ -86,8 +94,10 @@ class SharedBackbone(nn.Module):
             relations = batch.root_relations(roots, h.dtype)
         return self.composer.forward_roots(batch.pad(h), roots, relations.to(h.dtype), batch.valid_nodes)
 
-    def forward_batch(self, x, batch, edge_attr=None):
-        return self.compose_batch(self.encode_experts(x, batch.edge_index, edge_attr), batch)
+    def forward_batch(self, x, batch, edge_attr=None, return_experts=False):
+        h = self.encode_experts(x, batch.edge_index, edge_attr)
+        z = self.compose_batch(h, batch)
+        return (z, h) if return_experts else z
     # ===== FedG2C ADD END A/C =====
 
 
@@ -95,18 +105,19 @@ class EncodingBranch(nn.Module):
     def __init__(self, shared: SharedBackbone, input_dim, edge_dim=0, node_cardinalities=None, edge_cardinalities=None):
         super().__init__()
         hidden = shared.composer.dim
-        self.node_adapter = FeatureAdapter(input_dim, hidden, node_cardinalities)
-        self.edge_adapter = FeatureAdapter(edge_dim, hidden, edge_cardinalities) if edge_dim else None
+        bias_init = shared.private_adapter_bias_init
+        self.node_adapter = FeatureAdapter(input_dim, hidden, node_cardinalities, bias_init=bias_init)
+        self.edge_adapter = FeatureAdapter(edge_dim, hidden, edge_cardinalities, bias_init=bias_init) if edge_dim else None
         self.shared = shared
 
-    def forward(self, view):
+    def forward(self, view, return_experts=False):
         x = self.node_adapter(view.x)
         if self.edge_adapter is not None and view.edge_attr is None:
             raise ValueError("This client schema requires edge features")
         if self.edge_adapter is None and view.edge_attr is not None:
             raise ValueError("Unexpected edge features; do not silently discard them")
         edge = self.edge_adapter(view.edge_attr) if self.edge_adapter is not None else None
-        return self.shared(x, view.edge_index, edge)
+        return self.shared(x, view.edge_index, edge, return_experts=return_experts)
 
 
 class LocalPredictionModel(nn.Module):

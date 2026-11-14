@@ -31,6 +31,27 @@ def iter_graphs(paths):
             yield view
 
 
+def count_source_samples(paths, sampling_unit):
+    """Dataset size, independent of epochs, augmentations and optimizer steps.
+
+    Node samples are distinct eligible source roots (non-self incident edges),
+    matching NeighborhoodEdgeSampler. Graph samples are source graph records.
+    Target labels and downstream support-set sizes are never consulted.
+    """
+    if sampling_unit not in ('graph', 'node'):
+        raise ValueError('sampling_unit must be graph or node')
+    count = 0
+    for graph in iter_graphs(paths):
+        if sampling_unit == 'graph':
+            count += 1
+        else:
+            edges = graph.edge_index
+            count += torch.unique(edges[:, edges[0] != edges[1]]).numel()
+    if count < 1:
+        raise ValueError('Client has no permitted source training samples')
+    return count
+
+
 def write_smoke_manifest(directory):
     """Small generic graphs only; these are NOT the future server SBM probes."""
     directory = Path(directory)

@@ -100,11 +100,13 @@ class ResidualAdapter(nn.Module):
 
 
 def install_lora(composer, config):
-    """Use official microsoft/LoRA Linear on Q and K; never merge base weights."""
-    for name in ('query', 'key'):
-        old = getattr(composer, name, None)
+    """LoRA on Q/K, or both gate Linear layers; never merge base weights."""
+    targets = ([(composer.gate, '0'), (composer.gate, '2')] if composer.mode == 'linear_gate'
+               else [(composer, 'query'), (composer, 'key')])
+    for parent, name in targets:
+        old = getattr(parent, name, None)
         if not isinstance(old, nn.Linear):
-            raise ValueError('LoRA requires a composer with query/key Linear projections')
+            raise ValueError('LoRA target must be a Linear projection')
         new = LoRALinear(old.in_features, old.out_features, r=config.rank,
                          lora_alpha=config.lora_alpha, lora_dropout=0,
                          bias=old.bias is not None, merge_weights=False)
@@ -113,7 +115,7 @@ def install_lora(composer, config):
             if old.bias is not None:
                 new.bias.copy_(old.bias)
                 new.bias.requires_grad_(False)
-        setattr(composer, name, new)
+        setattr(parent, name, new)
 
 
 class TargetModel(nn.Module):
@@ -233,5 +235,6 @@ class TargetModel(nn.Module):
                 groups[group] = groups.get(group, 0) + value.numel()
         return {'trainable_by_group':groups, 'trainable_total':sum(groups.values()),
                 'total_parameters':sum(p.numel() for p in self.parameters()),
-                'trainable_names':[n for n,p in self.named_parameters() if p.requires_grad]}
+                'trainable_names':[n for n,p in self.named_parameters() if p.requires_grad],
+                'lora_targets':[n for n,m in self.named_modules() if isinstance(m, LoRALinear)]}
 # ===== FedG2C ADD END C =====

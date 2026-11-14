@@ -13,7 +13,9 @@ def main(argv=None):
     parser=argparse.ArgumentParser(description='B: server-only aggregation of A shared checkpoints')
     parser.add_argument('--client-checkpoints',nargs='+',type=Path,required=True)
     parser.add_argument('--server-config',type=Path,required=True)
-    parser.add_argument('--aggregation',choices=['fedavg','output_only','response'])
+    parser.add_argument('--aggregation',choices=['fedavg','sample_weighted','output_only','response'])
+    parser.add_argument('--client-sample-counts', nargs='+', type=int,
+                        help='Source dataset counts in checkpoint order; required for legacy sample-weighted uploads')
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--device',default='cpu')
     parser.add_argument('--threads',type=int,default=1)
@@ -26,9 +28,15 @@ def main(argv=None):
         raw['mode']=args.aggregation
     config=ResponseAggregationConfig(**raw)
     model_config,states,provenance=load_uploads(args.client_checkpoints)
+    counts = args.client_sample_counts or provenance.get('sample_counts')
+    if config.mode == 'sample_weighted' and (counts is None or len(counts) != len(states)
+            or any(type(n) is not int or n < 1 for n in counts)):
+        parser.error('sample_weighted requires positive source counts for every checkpoint')
     args.output.mkdir(parents=True,exist_ok=False)
     server=ResponsePreservingServer(SharedBackbone(model_config),config,args.device)
-    state,report=server.execute(states,round_id=provenance['round_id'])
+    state,report=server.execute(states,round_id=provenance['round_id'],sample_counts=counts)
+    if config.mode == 'sample_weighted':
+        report['client_ids'] = provenance['client_ids']
     save_aggregation(args.output,state,model_config,config,report,provenance,server.last_probe_banks)
     print(json.dumps({'mode':config.mode,'weights':report['weights'],'extra_client_exchanges':0}))
 

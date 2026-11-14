@@ -29,10 +29,10 @@ class EdgePredictionClient:
         return {k: v.detach().cpu().clone() for k, v in self.model.main_branch.shared.state_dict().items()}
 
     # ===== FedG2C ADD BEGIN B：共享参数快照封装为 Gefra 本地消息 =====
-    def get_local_message(self):
+    def get_local_message(self, num_samples=1):
         # get_pretrain_model remains the raw-state interface for checkpoints/tests.
         from .messages import client_message
-        return client_message(self.get_pretrain_model())
+        return client_message(self.get_pretrain_model(), num_samples=num_samples)
     # ===== FedG2C ADD END B =====
 
     def pretrain(self, graphs_factory, epochs=1, views_per_graph=1, seed=0, max_steps=None,
@@ -45,6 +45,10 @@ class EdgePredictionClient:
             raise ValueError('Use positive physical_batch_size')
         if min(physical_batch_size, batch_size) > 1 and self.config.dropout:
             raise ValueError('Use physical_batch_size=1 with dropout to preserve the scalar RNG stream')
+        regularized = self.config.variance_weight > 0
+        combined_variance = regularized and self.config.variance_representation == 'both'
+        if regularized and (sampling_unit != 'node' or views_per_graph != 1):
+            raise ValueError('Root variance requires sampling_unit=node and views_per_graph=1')
         generator = torch.Generator().manual_seed(seed)
         optimizer = torch.optim.AdamW((p for p in self.model.parameters() if p.requires_grad),
                                      lr=self.config.lr, weight_decay=self.config.weight_decay)
@@ -70,12 +74,16 @@ class EdgePredictionClient:
             optimizer.zero_grad(set_to_none=True)
             # Diagnostics stay on the device until an optimizer update. No
             # per-view .item(), reference D2H copy, or GPU validation readback.
-            scalars = torch.stack((norm.detach(), diagnostics['loss'], diagnostics['context_std'])).cpu().tolist()
+            scalar_keys = (('loss', 'context_std', 'prediction_loss', 'variance_loss', 'root_std', 'expert_root_std')
+                           if combined_variance else
+                           ('loss', 'context_std', 'prediction_loss', 'variance_loss', 'root_std')
+                           if regularized else ('loss', 'context_std'))
+            scalars = torch.stack((norm.detach(), *(diagnostics[key] for key in scalar_keys))).cpu().tolist()
             item = {'step': len(metrics)+1, 'epoch': epoch+1, 'views': pending,
-                    'gradient_norm': scalars[0], 'loss': scalars[1] / pending,
-                    'context_std': scalars[2] / pending,
+                    'gradient_norm': scalars[0],
+                    **{key: value / pending for key, value in zip(scalar_keys, scalars[1:])},
                     **{key: value / pending for key, value in diagnostics.items()
-                       if key not in ('loss', 'context_std')}}
+                       if key not in scalar_keys}}
             metrics.append(item)
             if log_every and (len(metrics) == 1 or len(metrics) % log_every == 0):
                 print(json.dumps({'stage':'local_pretraining','client':self.client_id,
@@ -89,9 +97,21 @@ class EdgePredictionClient:
                           sampling_unit=sampling_unit, total_views=total_views,
                           loss_reduction='mean prediction-node loss per view, then mean independent views per update',
                           root_coverage=root_coverage)
+            if regularized:
+                result['variance_regularization'] = {
+                    'weight': self.config.variance_weight,
+                    'target': self.config.variance_target,
+                    'eps': self.config.variance_eps,
+                    'representation': self.config.variance_representation,
+                    'view': self.config.variance_view,
+                    'combination': 'sum of composed and expert floors' if combined_variance else 'single floor',
+                    'statistic': ('online ' + self.config.variance_view + '-view roots across the complete logical batch; '
+                                  'each expert/channel separately when representation is experts or both'),
+                    'gradient': 'two passes over identical views; global root-loss derivative replayed by physical chunk',
+                    'singleton_batch': 'zero auxiliary loss; no cross-batch statistics'}
             return result
 
-        def consume():
+        def consume(root_gradient=None, logical_count=None):
             nonlocal pending, total_views, references, buffered
             count = len(buffered)
             if min(physical_batch_size, batch_size) == 1:
@@ -102,12 +122,35 @@ class EdgePredictionClient:
                 loss, outputs = self.model.forward_batch(batch)
             if not torch.isfinite(loss):
                 raise FloatingPointError('Nonfinite node prediction loss')
-            loss.backward()
+            backward_loss = loss
+            clean_regularization = root_gradient is not None and self.config.variance_view == 'reference'
+            if root_gradient is not None and not clean_regularization:
+                if combined_variance:
+                    composed_gradient, expert_gradient = root_gradient
+                    replay = ((outputs['online_roots'] * composed_gradient).sum() +
+                              (outputs['online_expert_roots'] * expert_gradient).sum())
+                else:
+                    replay = (outputs['online_roots'] * root_gradient).sum()
+                backward_loss = loss + self.config.variance_weight * logical_count * replay
+            backward_loss.backward()
+            if clean_regularization:
+                clean_roots = regularization_roots(buffered)
+                if combined_variance:
+                    clean_composed, clean_experts = clean_roots
+                    composed_gradient, expert_gradient = root_gradient
+                    replay = ((clean_composed * composed_gradient).sum() +
+                              (clean_experts * expert_gradient).sum())
+                else:
+                    replay = (clean_roots * root_gradient).sum()
+                (self.config.variance_weight * logical_count * replay).backward()
             pending += count
             total_views += count
             current = outputs['reference']
             references = current[-128:] if references is None else torch.cat((references, current))[-128:]
-            for key, value in (('loss', loss.detach()), ('context_std', outputs['context_std'].sum())):
+            diagnostics_values = [('loss', loss.detach()), ('context_std', outputs['context_std'].sum())]
+            if regularized:
+                diagnostics_values.append(('prediction_loss', loss.detach()))
+            for key, value in diagnostics_values:
                 diagnostics[key] = diagnostics.get(key, 0) + value
             for pair in buffered:
                 values = {'view_nodes': pair.visible_view.num_nodes,
@@ -120,6 +163,77 @@ class EdgePredictionClient:
                 for key, value in values.items():
                     diagnostics[key] = diagnostics.get(key, 0) + value
             buffered = []
+
+        def regularization_roots(group):
+            track_experts = self.config.variance_representation in ('experts', 'both')
+            clean = self.config.variance_view == 'reference'
+            if min(physical_batch_size, batch_size) == 1:
+                pair = group[0].to(self.device)
+                view = pair.reference_view if clean else pair.visible_view
+                keep = None if clean else pair.feature_keep
+                result = self.model.main_branch(view, keep, return_experts=track_experts)
+                composed, experts = result if track_experts else (result, None)
+                if self.config.variance_representation == 'experts':
+                    return experts[pair.root_index:pair.root_index + 1]
+                if combined_variance:
+                    return (composed[pair.root_index:pair.root_index + 1],
+                            experts[pair.root_index:pair.root_index + 1])
+                return composed[pair.root_index:pair.root_index + 1]
+            pair = EdgePredictionBatch.collate(group).to(self.device)
+            view = pair.reference_view if clean else pair.visible_view
+            keep = None if clean else pair.feature_keep
+            result = self.model.main_branch.forward_batch(view, keep, return_experts=track_experts)
+            composed, experts = result if track_experts else (result, None)
+            if self.config.variance_representation == 'experts':
+                return experts[pair.root_indices]
+            if combined_variance:
+                return composed[pair.root_indices], experts[pair.root_indices]
+            return composed[pair.root_indices]
+
+        def consume_regularized():
+            nonlocal buffered
+            from .edge_model import variance_floor_loss
+            logical_pairs, buffered = buffered, []
+            count = len(logical_pairs)
+            chunk_size = min(physical_batch_size, batch_size)
+            composed_roots, expert_roots = [], []
+            with torch.no_grad():
+                for start in range(0, count, chunk_size):
+                    group = logical_pairs[start:start + chunk_size]
+                    result = regularization_roots(group)
+                    if combined_variance:
+                        composed_roots.append(result[0])
+                        expert_roots.append(result[1])
+                    else:
+                        composed_roots.append(result)
+            composed_values = torch.cat(composed_roots).detach().requires_grad_(True)
+            if combined_variance:
+                expert_values = torch.cat(expert_roots).detach().requires_grad_(True)
+                composed_loss = variance_floor_loss(composed_values, self.config.variance_target,
+                                                    self.config.variance_eps)
+                expert_loss = variance_floor_loss(expert_values, self.config.variance_target,
+                                                  self.config.variance_eps)
+                variance_loss = composed_loss + expert_loss
+                root_gradient = (torch.autograd.grad(variance_loss, (composed_values, expert_values))
+                                 if count > 1 else (torch.zeros_like(composed_values),
+                                                    torch.zeros_like(expert_values)))
+            else:
+                variance_loss = variance_floor_loss(composed_values, self.config.variance_target,
+                                                    self.config.variance_eps)
+                root_gradient = (torch.autograd.grad(variance_loss, composed_values)[0]
+                                 if count > 1 else torch.zeros_like(composed_values))
+            for start in range(0, count, chunk_size):
+                buffered = logical_pairs[start:start + chunk_size]
+                if combined_variance:
+                    consume((root_gradient[0][start:start + len(buffered)],
+                             root_gradient[1][start:start + len(buffered)]), count)
+                else:
+                    consume(root_gradient[start:start + len(buffered)], count)
+            diagnostics['variance_loss'] = variance_loss.detach() * count
+            diagnostics['root_std'] = composed_values.detach().std(0, unbiased=False).mean() * count
+            if combined_variance:
+                diagnostics['expert_root_std'] = expert_values.detach().std(0, unbiased=False).mean() * count
+            diagnostics['loss'] += self.config.variance_weight * variance_loss.detach() * count
 
         # Node clients have one large graph; retain its adjacency index across
         # epochs, while graph datasets retain only one transient small index.
@@ -140,7 +254,10 @@ class EdgePredictionClient:
                     buffered.append(sampler.sample_edge_view(self.config, self.feature_channels, generator, root))
                     if root is not None:
                         covered.append(root)
-                    if len(buffered) == min(physical_batch_size, batch_size - pending):
+                    if regularized:
+                        if len(buffered) == batch_size:
+                            consume_regularized()
+                    elif len(buffered) == min(physical_batch_size, batch_size - pending):
                         consume()
                     if pending == batch_size:
                         update(epoch)
@@ -155,7 +272,7 @@ class EdgePredictionClient:
                         'eligible_roots':len(order), 'roots_visited':len(set(covered)), 'complete':True})
             # Do not merge the final incomplete logical batch across epochs.
             if buffered:
-                consume()
+                consume_regularized() if regularized else consume()
             if pending:
                 update(epoch)
                 if max_steps is not None and len(metrics) >= max_steps:

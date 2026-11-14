@@ -47,6 +47,8 @@ def main(argv=None):
     parser.add_argument('--device',default='cpu')
     parser.add_argument('--threads',type=int,default=1)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--recover',action='store_true',
+                        help='Save/recover all private client states and RNG after each client and round')
     args=parser.parse_args(argv)
     if args.checkpoint_interval < 1:
         parser.error('--checkpoint-interval must be positive')
@@ -72,13 +74,16 @@ def main(argv=None):
     torch.manual_seed(args.seed)
     if not args.smoke:
         manifest=read_manifest(args.source_manifest)
-    args.output.mkdir(parents=True,exist_ok=False)
+    recovery_path=args.output/'recovery.pt'
+    recovering=args.recover and recovery_path.is_file()
+    args.output.mkdir(parents=True,exist_ok=recovering)
     (args.output/'checkpoint_policy.json').write_text(json.dumps({
         'interval':args.checkpoint_interval,'round_numbering':'one-based completed rounds',
         'keep_final':True,'saved_round_ids':[r for r in range(args.rounds)
             if should_save_checkpoint(r,args.rounds,args.checkpoint_interval)]},indent=2)+'\n')
     if args.smoke:
-        manifest=read_manifest(write_smoke_manifest(args.output/'smoke_inputs'))
+        smoke_manifest=args.output/'smoke_inputs/source_manifest.json'
+        manifest=read_manifest(smoke_manifest if recovering else write_smoke_manifest(args.output/'smoke_inputs'))
     source_counts = ([count_source_samples(r['graphs'], args.sampling_unit) for r in manifest['clients']]
                      if server_config.mode == 'sample_weighted' else None)
     shared=SharedBackbone(config)
@@ -94,20 +99,54 @@ def main(argv=None):
                           'graph_counts':{record['id']:len(pool.graphs) for record,pool in zip(manifest['clients'],source_pools)}}),flush=True)
     global_state={k:v.detach().cpu().clone() for k,v in shared.state_dict().items()}
     traffic=[]
-    for round_id in range(args.rounds):
+    from fedg2c.recovery import atomic_save,cpu_tree,rng_state,restore_rng
+    signature={key:value for key,value in vars(args).items() if key not in ('output','recover')}
+    signature={key:str(value) if isinstance(value,Path) else value for key,value in signature.items()}
+    signature.update(module_a=config.to_dict(),module_b=server_config.to_dict(),
+                     manifest_sha256=__import__('hashlib').sha256(json.dumps(manifest,sort_keys=True).encode()).hexdigest())
+    start_round,next_client,resumed_messages=0,0,{}
+    if recovering:
+        saved=torch.load(recovery_path,map_location='cpu',weights_only=False)
+        if saved['signature'] != signature:
+            raise ValueError('Recovery configuration or source manifest changed')
+        for client,state in zip(clients,saved['clients']):
+            client.model.load_state_dict(state,strict=True)
+        global_state,traffic=saved['global_state'],saved['traffic']
+        start_round,next_client=saved['round_id'],saved['next_client']
+        resumed_messages=saved['local_messages']
+        restore_rng(saved['rng'])
+        print(json.dumps({'stage':'recovered','round':start_round,'next_client':next_client}),flush=True)
+
+    def save_recovery(round_id,next_client,local_messages):
+        if args.recover:
+            atomic_save(dict(signature=signature,round_id=round_id,next_client=next_client,
+                             global_state=cpu_tree(global_state),traffic=traffic,
+                             local_messages=cpu_tree(local_messages),
+                             clients=[cpu_tree(client.model.state_dict()) for client in clients],
+                             rng=rng_state()),recovery_path)
+
+    if args.recover and not recovering:
+        save_recovery(0,0,{})
+    for round_id in range(start_round,args.rounds):
         save_checkpoint=should_save_checkpoint(round_id,args.rounds,args.checkpoint_interval)
         folder=args.output/f'round_{round_id:03d}'
-        folder.mkdir()
+        folder.mkdir(exist_ok=recovering)
         start_hash=state_digest(global_state)
         uploads=[]
         # ===== FedG2C ADD BEGIN B：按 Gefra 的下发列表／上传消息字典传输 =====
         from fedg2c.messages import named_weights
         global_message = named_weights(global_state)
-        local_messages = {}
+        local_messages = dict(resumed_messages) if round_id == start_round else {}
+        resume_index=next_client if round_id == start_round else 0
+        if resume_index:
+            from fedg2c.messages import states_from_client_messages
+            uploads=states_from_client_messages(local_messages)
         # ===== FedG2C ADD END B =====
         
         
         for index,(client,record) in enumerate(zip(clients,manifest['clients'])):
+            if index < resume_index:
+                continue
             # ===== FedG2C ADD BEGIN B：替代原状态字典下发，旧调用保留供审阅 =====
             # Previous: client.set_pretrain_model(global_state)
             client.set_pretrain_model(global_message)
@@ -146,7 +185,7 @@ def main(argv=None):
                 local.update(num_samples=num_samples, sample_unit=args.sampling_unit)
             # ===== FedG2C ADD END B =====
             client_folder=folder/f'client_{index}'
-            client_folder.mkdir()
+            client_folder.mkdir(exist_ok=recovering)
             metadata={'schema_version':2,'config':config.to_dict(),'protocol_id':manifest['protocol_id'],
                       'round_id':round_id,'seed':args.seed,'initial_shared_sha256':start_hash,
                       'relation_schema':RELATION_SCHEMA,'stage':'local_pretraining_only',
@@ -159,6 +198,7 @@ def main(argv=None):
             if save_checkpoint:
                 torch.save({'metadata':metadata,'client_id':record['id'],'state_dict':state},client_folder/'shared_backbone.pt')
             (client_folder/'metrics.json').write_text(json.dumps(local,indent=2,allow_nan=False)+'\n')
+            save_recovery(round_id,index+1,local_messages)
         # ===== FedG2C ADD BEGIN B：替代原上传列表；服务器内部仍用相同参数聚合 =====
         # Previous: global_state,report=server.execute(uploads,round_id=round_id)
         global_state,report=server.execute(local_messages,round_id=round_id)
@@ -166,7 +206,7 @@ def main(argv=None):
         provenance={'protocol_id':manifest['protocol_id'],'client_ids':[r['id'] for r in manifest['clients']],
                     'initial_shared_sha256':start_hash,'initialization_check':'all clients received same round state',
                     'uploaded_state_sha256':[state_digest(s) for s in uploads]}
-        server_folder=folder/'server';server_folder.mkdir()
+        server_folder=folder/'server';server_folder.mkdir(exist_ok=recovering)
         save_aggregation(server_folder,global_state,config,server_config,report,provenance,server.last_probe_banks,
                          save_checkpoint=save_checkpoint)
         state_bytes=sum(v.numel()*v.element_size() for v in global_state.values())
@@ -174,6 +214,7 @@ def main(argv=None):
                         'uplink_shared_bytes':len(clients)*state_bytes,'extra_candidate_messages':0,
                         'note':'logical tensor payload; no serialization/network overhead counted'})
         print(json.dumps({'round':round_id,'mode':server_config.mode,'weights':report['weights']}),flush=True)
+        save_recovery(round_id+1,0,{})
     (args.output/'communication.json').write_text(json.dumps(traffic,indent=2)+'\n')
     # Local snapshots are private files, never passed to ResponsePreservingServer.
     for index,client in enumerate(clients):

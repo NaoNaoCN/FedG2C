@@ -1,6 +1,6 @@
 # 节点分类三组消融：代码审阅记录（2026-11-14）
 
-远端 `chenyh26@192.168.5.97:31840`。独立工作区 `/home/chenyh26/FedG2C_worktrees/ablation_pipeline_20261114`，分支 `codex/ablation-pipeline-20261114`，基于主线 `5698ac4`。修改尚未提交或推送，未同步本地源代码；正式实验未启动。
+远端 `chenyh26@192.168.5.97:31840`。独立工作区 `/home/chenyh26/FedG2C_worktrees/ablation_pipeline_20261114`，分支 `codex/ablation-pipeline-20261114`，基于主线 `5698ac4`。此文档记录最初审核版本；用户现已审核通过，并授权在 `chenyh26@192.168.5.2:31214` 部署训练。审核核心代码已提交为 `f49eab5`。正式部署使用分支 `codex/ablation-deploy-20261114`，具体运行见 `node_ablation_deployment_20261114.md`。
 
 ## 已确认的实验定义
 
@@ -55,7 +55,7 @@
 
 所有设置 LoRA rank=4、alpha=4；原组合器注入 Q/K，纯门控注入两层 Linear。原共享基座冻结，低秩权重不与基座合并。报告新增实际 LoRA 注入路径和参数量。
 
-hidden_dim=128 时，Q/K LoRA 共 2048 个参数，门控 LoRA 共 1540 个参数。本次不强行匹配参数量。按用户确认，保留原微调初始化顺序：相同 seed 编号和相同支持集不意味着不同结构的目标适配器与分类头初值逐项相同。`fedg2c/target_train.py` 未修改。
+hidden_dim=128 时，Q/K LoRA 共 2048 个参数，门控 LoRA 共 1540 个参数。本次不强行匹配参数量。按用户确认，保留原微调初始化顺序：相同 seed 编号和相同支持集不意味着不同结构的目标适配器与分类头初值逐项相同。审核版本的 `fedg2c/target_train.py` 未修改；部署版本仅增加可选断点恢复，未重排初始化或追加 reseed。
 
 预训练仍为 100 轮、每客户端每轮 5 个完整 epoch，逻辑 batch=1024，物理 batch=128，最终轮及每 20 轮保存 checkpoint。下游保持最大 1000 epoch、每 10 epoch 验证、patience=15 次验证事件，验证同分保留首次。微调阶段关闭测试；全部模型选定并固定哈希后，再做独立最终测试。此次仅准备配置与代码，未启动这些任务或最终测试。
 
@@ -80,4 +80,4 @@ python -m fedg2c.node_ablation_matrix \
   --write-configs runs/ablation_plan_review
 ```
 
-这个入口只解析和写出配置，没有执行训练的分支。用户审核通过后才同步 GitHub 与本地；正式启动实验仍需后续指令。
+这个入口只解析和写出配置，没有执行训练的分支。该入口仅生成计划。用户已授权同步及正式训练；部署入口与证据见部署文档。

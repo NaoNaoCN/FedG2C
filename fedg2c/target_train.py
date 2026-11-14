@@ -92,9 +92,11 @@ def evaluate(model, samples, device):
     return metrics(torch.cat(logits), torch.cat(labels), model.task['objective'])
 
 
-def run_target(checkpoint, manifest_path, config, output, device='cpu', data_cache=None):
+def run_target(checkpoint, manifest_path, config, output, device='cpu', data_cache=None, *, recover=False):
     output = Path(output)
-    if output.exists():
+    recovery_path = output/'recovery.pt'
+    recovering = recover and recovery_path.is_file()
+    if output.exists() and not recovering:
         raise FileExistsError('Use a new output directory')
     torch.manual_seed(config.seed)
     if str(device).startswith('cuda'):
@@ -115,14 +117,32 @@ def run_target(checkpoint, manifest_path, config, output, device='cpu', data_cac
     shared, shared_config, meta = load_shared(checkpoint)
     model = TargetModel(shared, shared_config, manifest['feature_schema'], manifest['task'], config).to(device)
     optimizer = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=config.lr, weight_decay=config.weight_decay)
-    output.mkdir(parents=True)
+    output.mkdir(parents=True, exist_ok=recovering)
     generator = torch.Generator().manual_seed(config.seed)
     minimize = config.selection_metric == 'loss'
     history, best_score, best_state, best_epoch = [], (float('inf') if minimize else -float('inf')), None, None
     stale_epochs, best_valid, optimizer_steps = 0, None, 0
     parameters = [p for p in model.parameters() if p.requires_grad]
     epochs_ran = 0
-    for epoch in range(config.epochs):
+    from .recovery import atomic_save, cpu_tree, rng_state, restore_rng
+    signature = dict(config=asdict(config), source_state_sha256=meta['state_sha256'],
+                     manifest_sha256=hashlib.sha256(Path(manifest_path).read_bytes()).hexdigest())
+    first_epoch, training_done = 0, False
+    if recovering:
+        saved = torch.load(recovery_path, map_location='cpu', weights_only=False)
+        if saved['signature'] != signature:
+            raise ValueError('Target recovery configuration, source weights or data changed')
+        model.load_state_dict(saved['model'], strict=True)
+        optimizer.load_state_dict(saved['optimizer'])
+        generator.set_state(saved['generator'])
+        history, best_score, best_state = saved['history'], saved['best_score'], saved['best_state']
+        best_epoch, best_valid = saved['best_epoch'], saved['best_valid']
+        stale_epochs, optimizer_steps = saved['stale_epochs'], saved['optimizer_steps']
+        epochs_ran = first_epoch = saved['next_epoch']
+        training_done = saved['training_done']
+        restore_rng(saved['rng'])
+        print(json.dumps({'stage':'target_recovered','next_epoch':first_epoch+1}), flush=True)
+    for epoch in range(first_epoch, config.epochs) if not training_done else ():
         epochs_ran = epoch + 1
         started = time.monotonic()
         model.train()
@@ -178,7 +198,16 @@ def run_target(checkpoint, manifest_path, config, output, device='cpu', data_cac
             best_state = {k:v.detach().cpu().clone() for k,v in model.state_dict().items()}
         else:
             stale_epochs += 1
-        if config.early_stopping_patience and stale_epochs >= config.early_stopping_patience:
+        training_done = bool((config.early_stopping_patience and stale_epochs >= config.early_stopping_patience)
+                             or epoch == config.epochs-1)
+        if recover:
+            atomic_save(dict(signature=signature, model=cpu_tree(model.state_dict()),
+                             optimizer=cpu_tree(optimizer.state_dict()), generator=generator.get_state(),
+                             rng=rng_state(), next_epoch=epoch+1, history=history, best_score=best_score,
+                             best_state=best_state, best_epoch=best_epoch, best_valid=best_valid,
+                             stale_epochs=stale_epochs, optimizer_steps=optimizer_steps,
+                             training_done=training_done), recovery_path)
+        if training_done:
             break
     if best_state is None:
         raise FloatingPointError('No finite validation checkpoint')
